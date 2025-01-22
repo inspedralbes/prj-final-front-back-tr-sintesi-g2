@@ -13,5 +13,6 @@ El modo multijugador permitirá a los jugadores colaborar en misiones especiales
 
 ## Enlaces del Proyecto
 
-- **Repositorio GitHub**: [Enlace al repositorio](#)
+- **Repositorio GitHub FRONT i BACK**: [Enlace al repositorio](https://github.com/inspedralbes/prj-final-front-back-tr-sintesi-g2)
+- **Repositorio GitHub ANDROID**: [Enlace al repositorio](https://github.com/inspedralbes/prj-final-android-tr-sintesi-g2)
 - **Tablero en Taiga**: [Enlace al tablero](#)
