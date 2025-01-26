@@ -37,6 +37,49 @@ const dataConnection = {
       console.error('Error connecting to the database: ', error);
     }
   }
+  app.use(cors());
+  app.use(express.json());
+
+
+
+//-------------------- Registre  -------------------- //
+
+// Registre usuaris MENTOR
+app.post('/player', async (req, res) => {
+  const { nickname } = req.body;
+
+  // Validación de datos
+  if (!nickname) {
+    return res.status(400).send('Datos incompletos.');
+  }
+
+  let connection;
+
+  try {
+    // Conectar a la base de datos
+    connection = await connectDB();
+
+    // Ejecutar la consulta SQL
+    const [rows] = await connection.query(
+      `INSERT INTO PLAYER 
+      (nickname) 
+      VALUES (?)`,
+      [nickname]
+    );
+
+    const message = { message: `Jugador insertado con éxito.` };
+    res.status(201).send(JSON.stringify(message));
+  } catch (error) {
+    console.error('Error al insertar jugador:', error);
+    res.status(500).send('Error al insertar jugador.');
+  } finally {
+    if (connection) {
+      connection.end();
+      console.log("Connection closed.");
+    }
+  }
+});
+
 
 
   server.listen(port, () => {
