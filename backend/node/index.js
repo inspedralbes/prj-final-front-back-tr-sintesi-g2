@@ -3,8 +3,9 @@
 const mysql = require('mysql2/promise');
 const createDB = require('./configDB');
 const express = require('express');
-const app = express();
 const { createServer } = require('http');
+const cors = require('cors')
+const app = express();
 const server = createServer(app);
 require('dotenv').config({ path: './environment/.env' });
 const port = process.env.PORT;
