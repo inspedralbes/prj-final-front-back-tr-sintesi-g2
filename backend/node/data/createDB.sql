@@ -13,7 +13,7 @@ CREATE TABLE USERS (
 -- CREAR TABLA PLAYER
 CREATE TABLE PLAYER (
     id_player INT AUTO_INCREMENT PRIMARY KEY,
-    nickname VARCHAR(50) NOT NULL,
+    nickname VARCHAR(50) NOT NULL UNIQUE,
     creation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     total_time_played INT DEFAULT 0, -- en segundos
     achievements_unlocked INT DEFAULT 0
@@ -60,7 +60,7 @@ CREATE TABLE ENEMY (
     health INT NOT NULL,
     attack_power INT NOT NULL,
     defense INT NOT NULL,
-    experience_reward INT NOT NULL -- Recompensa en experiencia al derrotarlo
+    money_reward INT NOT NULL -- Recompensa en dinero al derrotarlo
 );
 
 -- CREAR TABLA INTERACTABLE_OBJECTS
