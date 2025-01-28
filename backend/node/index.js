@@ -43,7 +43,7 @@ const dataConnection = {
 
 
 
-//-------------------- Registre  -------------------- //
+//-------------------- Registre PLAYER  -------------------- //
 
 // Registre usuaris MENTOR
 app.post('/player', async (req, res) => {
@@ -81,7 +81,34 @@ app.post('/player', async (req, res) => {
   }
 });
 
+//-------------------- Login PLAYER  -------------------- //
 
+app.post('/loginPlayer', async (req, res) => {
+  const { nickname } = req.body;
+  if (!nickname) {
+    return res.status(400).send('Datos incompletos.');
+  }
+
+  let connection;
+
+  try {
+    connection = await connectDB();
+    const [rows] = await connection.query('SELECT * FROM PLAYER WHERE nickname = ? ', [nickname]);
+    console.log("Player: ", rows);
+
+    if (rows.length == 0) {
+      return res.status(404).send('Player no encontrado.');
+    }
+
+    res.status(201).json(rows[0]);
+  } catch (error) {
+    console.error('Error fetching player:', error);
+    res.status(500).send('Error fetching player.');
+  } finally {
+    connection.end();
+    console.log("Connection closed.");
+  }
+});
 
   server.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
