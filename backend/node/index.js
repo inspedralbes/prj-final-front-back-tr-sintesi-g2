@@ -110,6 +110,68 @@ app.post('/loginPlayer', async (req, res) => {
   }
 });
 
+
+
+//-------------------- crear GAME -------------------- //
+
+app.post('/newGame', async (req, res) => {
+  const {
+    nickname,
+    game_name,
+    game_status = 'active',
+    total_progress = 0.00,
+    level_reached = 1,
+    time_played = 0,
+  } = req.body;
+
+  if (!nickname || !game_name) {
+    return res.status(400).send('Datos incompletos.');
+  }
+
+  let connection;
+
+  try {
+    connection = await connectDB();
+
+    // Buscar al jugador por su nickname
+    const [playerRows] = await connection.query('SELECT id_player FROM PLAYER WHERE nickname = ?', [nickname]);
+    if (playerRows.length === 0) {
+      return res.status(404).send('Jugador no encontrado.');
+    }
+    const playerId = playerRows[0].id_player;
+
+    // Verificar si el jugador ya tiene un inventario
+    const [inventoryRows] = await connection.query('SELECT id_inventory FROM INVENTORY WHERE id_inventory IN (SELECT id_inventory FROM GAME WHERE id_player = ?)', [playerId]);
+    let inventoryId;
+
+    if (inventoryRows.length === 0) {
+      // Si no tiene inventario, creamos uno nuevo
+      const [inventoryResult] = await connection.query('INSERT INTO INVENTORY (id_item, quantity) VALUES (?, ?)', [1, 1]); // Se usa un item ficticio (id_item = 1)
+      inventoryId = inventoryResult.insertId;
+    } else {
+      inventoryId = inventoryRows[0].id_inventory;
+    }
+
+    // Crear una nueva entrada en la tabla GAME
+    const [gameResult] = await connection.query(
+      'INSERT INTO GAME (id_player, id_inventory, game_name, game_status, total_progress, level_reached, time_played) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [playerId, inventoryId, game_name, game_status, total_progress, level_reached, time_played]
+    );
+
+    res.status(201).json({
+      message: 'Juego creado con éxito',
+      gameId: gameResult.insertId,
+    });
+  } catch (error) {
+    console.error('Error al crear el juego:', error);
+    res.status(500).send('Error al crear el juego.');
+  } finally {
+    if (connection) connection.end();
+  }
+});
+
+
+
   server.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
   });
