@@ -171,6 +171,38 @@ app.post('/newGame', async (req, res) => {
 });
 
 
+//-------------------- borrar GAME -------------------- //
+
+app.delete('/deleteGame/:id_game', async (req, res) => {
+  const { id_game } = req.params;
+
+  if (!id_game) {
+    return res.status(400).send('ID de juego no proporcionado.');
+  }
+
+  let connection;
+  try {
+    connection = await connectDB();
+
+    // Verificar si el juego existe
+    const [gameRows] = await connection.query('SELECT * FROM GAME WHERE id_game = ?', [id_game]);
+    if (gameRows.length === 0) {
+      return res.status(404).send('Juego no encontrado.');
+    }
+
+    // Eliminar el juego (las restricciones ON DELETE CASCADE se encargan de las referencias)
+    await connection.query('DELETE FROM GAME WHERE id_game = ?', [id_game]);
+
+    res.status(200).json({ message: 'Juego eliminado con éxito' });
+  } catch (error) {
+    console.error('Error al eliminar el juego:', error);
+    res.status(500).send('Error al eliminar el juego.');
+  } finally {
+    if (connection) connection.end();
+  }
+});
+
+
 
   server.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
