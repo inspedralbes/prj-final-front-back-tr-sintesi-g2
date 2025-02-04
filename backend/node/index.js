@@ -160,6 +160,50 @@ app.post('/loginPlayer', async (req, res) => {
   }
 });
 
+// --------------------ÍTEM -------------------- //
+
+// -------------------- Obtener Inventario del Jugador -------------------- //
+app.get('/inventario/:player_id', async (req, res) => {
+  const { player_id } = req.params;
+  
+  let connection;
+  
+  try {
+      connection = await connectDB();
+      
+      const [rows] = await connection.query(
+          `SELECT 
+              i.id_item, 
+              i.item_name, 
+              i.item_description, 
+              i.item_type, 
+              i.value, 
+              i.rarity, 
+              i.item_image, 
+              pi.quantity
+          FROM PLAYER_INVENTORY pi
+          JOIN ITEM i ON pi.id_item = i.id_item
+          WHERE pi.player_id = ?`,
+          [player_id]
+      );
+      
+      if (rows.length === 0) {
+          return res.status(404).json({ message: 'El jugador no tiene ítems en su inventario.' });
+      }
+
+      res.json(rows);
+      
+  } catch (error) {
+      console.error('Error al obtener el inventario:', error);
+      res.status(500).json({ message: 'Error al obtener el inventario.' });
+  } finally {
+      if (connection) {
+          connection.end();
+      }
+  }
+});
+
+
 // -------------------- CARGAR IMÁGENES PARA UN ÍTEM -------------------- //
 
 app.get('/inventario/:itemId', async (req, res) => {
