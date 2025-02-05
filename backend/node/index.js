@@ -1,25 +1,20 @@
-/* Crear la base de datos a partir del archivo configDB.js */
-//(async () => { 
-//  await createDB();
-//})();
-
-
-
 // -------------------- CONSTANTES -------------------- //  
 
 const mysql = require('mysql2/promise');
+const createDB = require('./configDB');
 const express = require('express');
-const { createServer } = require('http');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config({ path: './environment/.env' });
-
 const app = express();
+const { createServer } = require('http');
 const server = createServer(app);
+require('dotenv').config({ path: './environment/.env' });
 const port = process.env.PORT;
-
+const cors = require('cors');  // Importa cors
 // -------------------- CONSTANTES -------------------- //
+
+/* Crear la base de datos a partir del archivo configDB.js */
+// (async () => { 
+//   await createDB();
+//  })();
 
 // CONEXIÓN A LA BASE DE DATOS
 const dataConnection = {
@@ -30,6 +25,8 @@ const dataConnection = {
   database: process.env.DB_NAME,
   waitForConnections: true
 };
+
+
 
 async function connectDB() {
   try {
