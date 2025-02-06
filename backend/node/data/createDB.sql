@@ -45,7 +45,6 @@ CREATE TABLE GAME (
     game_name VARCHAR(50) NOT NULL,
     game_status ENUM('active', 'completed') DEFAULT 'active',
     total_progress DECIMAL(5, 2) DEFAULT 0.00, -- porcentaje de progreso
-    level_reached INT DEFAULT 1,
     last_save_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     position_x DECIMAL(10,2) DEFAULT 0,
     position_y DECIMAL(10,2) DEFAULT 0,
