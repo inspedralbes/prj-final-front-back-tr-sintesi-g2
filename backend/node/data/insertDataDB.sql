@@ -24,10 +24,12 @@ VALUES
 (3, 2);  -- Iron Armor
 
 -- Insertar en la tabla GAME
-INSERT INTO GAME (id_player, id_inventory, game_name, game_status, total_progress, level_reached, last_save_date, time_played)
+INSERT INTO GAME 
+(id_player, id_inventory, game_name, game_status, total_progress, level_reached, last_save_date, position_x, position_y, health, coins, time_played) 
 VALUES 
-(1, 1, 'Adventure Quest', 'active', 20.00, 5, NOW(), 300),
-(2, 2, 'Warrior’s Path', 'completed', 100.00, 10, NOW(), 1500);
+(1, 1, 'Adventure Quest', 'active', 20.00, 5, NOW(), 10.5, 3.2, 70, 50, 300),
+(2, 2, 'Warrior’s Path', 'completed', 100.00, 10, NOW(), 15.0, 8.5, 80, 200, 1500);
+
 
 -- Insertar en la tabla ENEMY
 INSERT INTO ENEMY (enemy_name, enemy_type, health, attack_power, defense, money_reward)
