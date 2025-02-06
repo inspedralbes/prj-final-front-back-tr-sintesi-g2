@@ -122,6 +122,10 @@ app.post('/newGame', async (req, res) => {
     total_progress = 0.00,
     level_reached = 1,
     time_played = 0,
+    position_x = 0,
+    position_y = 0,
+    health = 100,
+    coins = 0
   } = req.body;
 
   if (!nickname || !game_name) {
@@ -133,35 +137,58 @@ app.post('/newGame', async (req, res) => {
   try {
     connection = await connectDB();
 
-    // Buscar al jugador por su nickname
-    const [playerRows] = await connection.query('SELECT id_player FROM PLAYER WHERE nickname = ?', [nickname]);
+    // Buscar ID del jugador
+    const [playerRows] = await connection.query(
+      'SELECT id_player FROM PLAYER WHERE nickname = ?', [nickname]
+    );
+
     if (playerRows.length === 0) {
       return res.status(404).send('Jugador no encontrado.');
     }
+
     const playerId = playerRows[0].id_player;
 
-    // Verificar si el jugador ya tiene un inventario
-    const [inventoryRows] = await connection.query('SELECT id_inventory FROM INVENTORY WHERE id_inventory IN (SELECT id_inventory FROM GAME WHERE id_player = ?)', [playerId]);
-    let inventoryId;
+    // Verificar si el jugador ya tiene una partida
+    const [gameRows] = await connection.query(
+      'SELECT id_game FROM GAME WHERE id_player = ?', [playerId]
+    );
 
+    if (gameRows.length > 0) {
+      return res.status(403).send('El jugador ya tiene una partida activa.');
+    }
+
+    // Crear un inventario si no existe
+    const [inventoryRows] = await connection.query(
+      'SELECT id_inventory FROM INVENTORY WHERE id_inventory IN (SELECT id_inventory FROM GAME WHERE id_player = ?)', 
+      [playerId]
+    );
+
+    let inventoryId;
     if (inventoryRows.length === 0) {
-      // Si no tiene inventario, creamos uno nuevo
-      const [inventoryResult] = await connection.query('INSERT INTO INVENTORY (id_item, quantity) VALUES (?, ?)', [1, 1]); // Se usa un item ficticio (id_item = 1)
+      const [inventoryResult] = await connection.query(
+        'INSERT INTO INVENTORY (id_item, quantity) VALUES (?, ?)', [1, 1]
+      );
       inventoryId = inventoryResult.insertId;
     } else {
       inventoryId = inventoryRows[0].id_inventory;
     }
 
-    // Crear una nueva entrada en la tabla GAME
+    // Crear la única partida del jugador
     const [gameResult] = await connection.query(
-      'INSERT INTO GAME (id_player, id_inventory, game_name, game_status, total_progress, level_reached, time_played) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [playerId, inventoryId, game_name, game_status, total_progress, level_reached, time_played]
+      `INSERT INTO GAME 
+      (id_player, id_inventory, game_name, game_status, total_progress, level_reached, time_played, position_x, position_y, health, coins) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [playerId, inventoryId, game_name, game_status, total_progress, level_reached, time_played, position_x, position_y, health, coins]
     );
 
     res.status(201).json({
       message: 'Juego creado con éxito',
       gameId: gameResult.insertId,
+      position: { x: position_x, y: position_y },
+      health,
+      coins
     });
+
   } catch (error) {
     console.error('Error al crear el juego:', error);
     res.status(500).send('Error al crear el juego.');
@@ -169,6 +196,7 @@ app.post('/newGame', async (req, res) => {
     if (connection) connection.end();
   }
 });
+
 
 
 
