@@ -120,7 +120,6 @@ app.post('/newGame', async (req, res) => {
     game_name,
     game_status = 'active',
     total_progress = 0.00,
-    level_reached = 1,
     time_played = 0,
     position_x = 0,
     position_y = 0,
@@ -176,9 +175,9 @@ app.post('/newGame', async (req, res) => {
     // Crear la única partida del jugador
     const [gameResult] = await connection.query(
       `INSERT INTO GAME 
-      (id_player, id_inventory, game_name, game_status, total_progress, level_reached, time_played, position_x, position_y, health, coins) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [playerId, inventoryId, game_name, game_status, total_progress, level_reached, time_played, position_x, position_y, health, coins]
+      (id_player, id_inventory, game_name, game_status, total_progress, time_played, position_x, position_y, health, coins) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [playerId, inventoryId, game_name, game_status, total_progress, time_played, position_x, position_y, health, coins]
     );
 
     res.status(201).json({

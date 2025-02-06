@@ -7,7 +7,8 @@ VALUES
 INSERT INTO PLAYER (nickname, creation_date, total_time_played, achievements_unlocked)
 VALUES 
 ('player1', NOW(), 1200, 5),
-('player2', NOW(), 3500, 10);
+('player2', NOW(), 3500, 10),
+('player3', NOW(), 5000, 11);
 
 -- Insertar en la tabla ITEM
 INSERT INTO ITEM (item_name, item_description, item_type, value, rarity)
@@ -27,7 +28,7 @@ VALUES
 INSERT INTO GAME 
 (id_player, id_inventory, game_name, game_status, total_progress, last_save_date, position_x, position_y, health, coins, time_played) 
 VALUES 
-(1, 1, 'Adventure Quest', 'active', 20.00, NOW(), 10.5, 3.2, 70, 50, 300),
+(3, 1, 'Adventure Quest', 'active', 20.00, NOW(), 10.5, 3.2, 70, 50, 300),
 (2, 2, 'Warrior’s Path', 'completed', 100.00, NOW(), 15.0, 8.5, 80, 200, 1500);
 
 
