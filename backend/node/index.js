@@ -288,11 +288,10 @@ app.put('/updateGame/:gameId', async (req, res) => {
     game_name,
     game_status,
     total_progress,
-    level_reached,
     time_played,
   } = req.body;
 
-  if (!game_name && !game_status && total_progress === undefined && level_reached === undefined && time_played === undefined) {
+  if (!game_name && !game_status && total_progress === undefined && time_played === undefined) {
     return res.status(400).send('No se proporcionaron datos para actualizar.');
   }
 
@@ -322,10 +321,6 @@ app.put('/updateGame/:gameId', async (req, res) => {
     if (total_progress !== undefined) {
       updateFields.push('total_progress = ?');
       updateValues.push(total_progress);
-    }
-    if (level_reached !== undefined) {
-      updateFields.push('level_reached = ?');
-      updateValues.push(level_reached);
     }
     if (time_played !== undefined) {
       updateFields.push('time_played = ?');
