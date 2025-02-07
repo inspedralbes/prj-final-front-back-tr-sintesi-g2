@@ -349,6 +349,36 @@ app.put('/updateGame/:gameId', async (req, res) => {
 
 
 
+app.get('/lastGame/:id_player', async (req, res) => {
+  const { id_player } = req.params;
+
+  if (!id_player) {
+    return res.status(400).send('ID de jugador no proporcionado.');
+  }
+
+  let connection;
+  try {
+    connection = await connectDB();
+
+    // Obtener la última partida del jugador
+    const [gameRows] = await connection.query(
+      'SELECT * FROM GAME WHERE id_player = ? ORDER BY last_save_date DESC LIMIT 1',
+      [id_player]
+    );
+
+    if (gameRows.length === 0) {
+      return res.status(404).send('No se encontró ninguna partida para este jugador.');
+    }
+
+    res.status(200).json(gameRows[0]);
+  } catch (error) {
+    console.error('Error al obtener la última partida:', error);
+    res.status(500).send('Error al obtener la última partida.');
+  } finally {
+    if (connection) connection.end();
+  }
+});
+
 
   server.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
