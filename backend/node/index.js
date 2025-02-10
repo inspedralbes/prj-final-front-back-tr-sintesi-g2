@@ -178,7 +178,7 @@ app.get('/inventario/:player_id', async (req, res) => {
               i.rarity, 
               i.item_image, 
               pi.quantity
-          FROM PLAYER_INVENTORY pi
+          FROM INVENTORY pi
           JOIN ITEM i ON pi.id_item = i.id_item
           WHERE pi.player_id = ?`,
           [player_id]
@@ -193,6 +193,47 @@ app.get('/inventario/:player_id', async (req, res) => {
   } catch (error) {
       console.error('Error al obtener el inventario:', error);
       res.status(500).json({ message: 'Error al obtener el inventario.' });
+  } finally {
+      if (connection) {
+          connection.end();
+      }
+  }
+});
+
+// -------------------- Agregar Ítem al Inventario -------------------- //
+app.post('/agregarItemInventario', async (req, res) => {
+  const { player_id, item_id, quantity } = req.body;  // Ahora estamos tomando player_id y item_id de la solicitud.
+
+  let connection;
+
+  try {
+      connection = await connectDB();
+
+      // Comprobar si el jugador ya tiene el ítem en su inventario
+      const [rows] = await connection.query(
+          `SELECT quantity FROM INVENTORY WHERE player_id = ? AND id_item = ?`,
+          [player_id, item_id]
+      );
+
+      if (rows.length > 0) {
+          // Si ya tiene el ítem, actualizar la cantidad
+          await connection.query(
+              `UPDATE INVENTORY SET quantity = quantity + ? WHERE player_id = ? AND id_item = ?`,
+              [quantity, player_id, item_id]
+          );
+      } else {
+          // Si no tiene el ítem, insertarlo en su inventario
+          await connection.query(
+              `INSERT INTO INVENTORY (player_id, id_item, quantity) VALUES (?, ?, ?)`,
+              [player_id, item_id, quantity]
+          );
+      }
+
+      res.status(200).json({ message: 'Ítem añadido al inventario.' });
+
+  } catch (error) {
+      console.error('Error al agregar el ítem al inventario:', error);
+      res.status(500).json({ message: 'Error al agregar el ítem al inventario.' });
   } finally {
       if (connection) {
           connection.end();
@@ -227,6 +268,39 @@ app.get('/inventario/:itemId', async (req, res) => {
     }
   }
 });
+
+// Obtener un ítem por ID
+app.get('/item/:id', async (req, res) => {
+  const { id } = req.params;
+  
+  let connection;
+  
+  try {
+      connection = await connectDB();
+
+      // Obtener el item por id
+      const [rows] = await connection.query(
+          `SELECT id_item, item_name, item_description, item_type, value, rarity, item_image
+          FROM item WHERE id_item = ?`, 
+          [id]
+      );
+
+      if (rows.length === 0) {
+          return res.status(404).json({ message: 'Ítem no encontrado.' });
+      }
+
+      res.status(200).json(rows[0]);  // Devuelve el ítem encontrado
+  } catch (error) {
+      console.error('Error al obtener el ítem:', error);
+      res.status(500).json({ message: 'Error al obtener el ítem.' });
+  } finally {
+      if (connection) {
+          connection.end();
+      }
+  }
+});
+
+
 
 server.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
