@@ -24,17 +24,20 @@ CREATE TABLE ITEM (
     id_item INT AUTO_INCREMENT PRIMARY KEY,
     item_name VARCHAR(50) NOT NULL,
     item_description TEXT,
-    item_type ENUM('weapon', 'armor', 'consumable', 'misc') NOT NULL,
+    item_type ENUM('pocion', 'llave') NOT NULL,  -- Modificado a 'pocion' y 'llave'
     value INT DEFAULT 0,
-    rarity ENUM('common', 'uncommon', 'rare', 'epic', 'legendary') DEFAULT 'common'
+    rarity ENUM('common', 'uncommon', 'rare', 'epic', 'legendary') DEFAULT 'common',
+    item_image VARCHAR(255) DEFAULT NULL  -- Agregado para almacenar la imagen
 );
 
 -- CREAR TABLA INVENTORY
 CREATE TABLE INVENTORY (
     id_inventory INT AUTO_INCREMENT PRIMARY KEY,
-    id_item INT NOT NULL, -- Relación directa con el ítem
+    player_id INT NOT NULL, -- Relación con el jugador
+    id_item INT NOT NULL, -- Relación con el ítem
     quantity INT DEFAULT 1, -- Cantidad del ítem
-    FOREIGN KEY (id_item) REFERENCES ITEM(id_item) ON DELETE CASCADE
+    FOREIGN KEY (player_id) REFERENCES PLAYER(id_player) ON DELETE CASCADE,  -- Relacionado con la tabla PLAYER
+    FOREIGN KEY (id_item) REFERENCES ITEM(id_item) ON DELETE CASCADE  -- Relacionado con la tabla ITEM
 );
 
 -- CREAR TABLA GAME
