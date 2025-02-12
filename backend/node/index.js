@@ -157,6 +157,276 @@ app.post('/loginPlayer', async (req, res) => {
   }
 });
 
+
+
+//-------------------- crear GAME -------------------- //
+
+app.post('/newGame', async (req, res) => {
+  const {
+    nickname,
+    game_name,
+    game_status = 'active',
+    total_progress = 0.00,
+    time_played = 0,
+    position_x = 0,
+    position_y = 0,
+    health = 100,
+    coins = 0
+  } = req.body;
+
+  if (!nickname || !game_name) {
+    return res.status(400).send('Datos incompletos.');
+  }
+
+  let connection;
+
+  try {
+    connection = await connectDB();
+
+    // Buscar ID del jugador
+    const [playerRows] = await connection.query(
+      'SELECT id_player FROM PLAYER WHERE nickname = ?', [nickname]
+    );
+
+    if (playerRows.length === 0) {
+      return res.status(404).send('Jugador no encontrado.');
+    }
+
+    const playerId = playerRows[0].id_player;
+
+    // Verificar si el jugador ya tiene una partida
+    const [gameRows] = await connection.query(
+      'SELECT id_game FROM GAME WHERE id_player = ?', [playerId]
+    );
+
+    if (gameRows.length > 0) {
+      return res.status(403).send('El jugador ya tiene una partida activa.');
+    }
+
+    // Crear un inventario si no existe
+    const [inventoryRows] = await connection.query(
+      'SELECT id_inventory FROM INVENTORY WHERE id_inventory IN (SELECT id_inventory FROM GAME WHERE id_player = ?)', 
+      [playerId]
+    );
+
+    let inventoryId;
+    if (inventoryRows.length === 0) {
+      const [inventoryResult] = await connection.query(
+        'INSERT INTO INVENTORY (id_item, quantity) VALUES (?, ?)', [1, 1]
+      );
+      inventoryId = inventoryResult.insertId;
+    } else {
+      inventoryId = inventoryRows[0].id_inventory;
+    }
+
+    // Crear la única partida del jugador
+    const [gameResult] = await connection.query(
+      `INSERT INTO GAME 
+      (id_player, id_inventory, game_name, game_status, total_progress, time_played, position_x, position_y, health, coins) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [playerId, inventoryId, game_name, game_status, total_progress, time_played, position_x, position_y, health, coins]
+    );
+
+    res.status(201).json({
+      message: 'Juego creado con éxito',
+      gameId: gameResult.insertId,
+      position: { x: position_x, y: position_y },
+      health,
+      coins
+    });
+
+  } catch (error) {
+    console.error('Error al crear el juego:', error);
+    res.status(500).send('Error al crear el juego.');
+  } finally {
+    if (connection) connection.end();
+  }
+});
+
+
+//-------------------- borrar GAME -------------------- //
+
+app.delete('/deleteGame/:id_game', async (req, res) => {
+  const { id_game } = req.params;
+
+  if (!id_game) {
+    return res.status(400).send('ID de juego no proporcionado.');
+  }
+
+  let connection;
+  try {
+    connection = await connectDB();
+
+    // Verificar si el juego existe
+    const [gameRows] = await connection.query('SELECT * FROM GAME WHERE id_game = ?', [id_game]);
+    if (gameRows.length === 0) {
+      return res.status(404).send('Juego no encontrado.');
+    }
+
+    // Eliminar el juego (las restricciones ON DELETE CASCADE se encargan de las referencias)
+    await connection.query('DELETE FROM GAME WHERE id_game = ?', [id_game]);
+
+    res.status(200).json({ message: 'Juego eliminado con éxito' });
+  } catch (error) {
+    console.error('Error al eliminar el juego:', error);
+    res.status(500).send('Error al eliminar el juego.');
+  } finally {
+    if (connection) connection.end();
+  }
+});
+
+
+//-------------------- actualizar INVENTORY -------------------- //
+
+app.put('/updateInventory/:playerId', async (req, res) => {
+  const { playerId } = req.params;
+  const { id_item, quantity } = req.body;
+
+  if (!id_item || quantity === undefined) {
+    return res.status(400).send('Datos incompletos. Se requiere id_item y quantity.');
+  }
+
+  let connection;
+
+  try {
+    connection = await connectDB();
+
+    // Verificar si el jugador existe
+    const [playerRows] = await connection.query('SELECT id_player FROM PLAYER WHERE id_player = ?', [playerId]);
+    if (playerRows.length === 0) {
+      return res.status(404).send('Jugador no encontrado.');
+    }
+
+    // Verificar si el jugador tiene un inventario
+    const [inventoryRows] = await connection.query('SELECT id_inventory FROM INVENTORY WHERE id_item = ? AND id_inventory IN (SELECT id_inventory FROM GAME WHERE id_player = ?)', [id_item, playerId]);
+    
+    if (inventoryRows.length === 0) {
+      return res.status(404).send('Inventario no encontrado para este jugador.');
+    }
+
+    // Actualizar la cantidad del ítem en el inventario
+    const [inventoryUpdateResult] = await connection.query(
+      'UPDATE INVENTORY SET quantity = ? WHERE id_inventory = ? AND id_item = ?',
+      [quantity, inventoryRows[0].id_inventory, id_item]
+    );
+
+    if (inventoryUpdateResult.affectedRows === 0) {
+      return res.status(400).send('No se pudo actualizar la cantidad del ítem.');
+    }
+
+    res.status(200).json({
+      message: 'Inventario actualizado con éxito',
+    });
+  } catch (error) {
+    console.error('Error al actualizar el inventario:', error);
+    res.status(500).send('Error al actualizar el inventario.');
+  } finally {
+    if (connection) connection.end();
+  }
+});
+
+
+
+
+//-------------------- actualizar GAME -------------------- //
+app.put('/updateGame/:gameId', async (req, res) => {
+  const { gameId } = req.params;
+  const {
+    game_name,
+    game_status,
+    total_progress,
+    time_played,
+  } = req.body;
+
+  if (!game_name && !game_status && total_progress === undefined && time_played === undefined) {
+    return res.status(400).send('No se proporcionaron datos para actualizar.');
+  }
+
+  let connection;
+
+  try {
+    connection = await connectDB();
+
+    // Buscar el juego por su ID
+    const [gameRows] = await connection.query('SELECT * FROM GAME WHERE id_game = ?', [gameId]);
+    if (gameRows.length === 0) {
+      return res.status(404).send('Juego no encontrado.');
+    }
+
+    const updateFields = [];
+    const updateValues = [];
+
+    // Construir los campos que se deben actualizar
+    if (game_name) {
+      updateFields.push('game_name = ?');
+      updateValues.push(game_name);
+    }
+    if (game_status) {
+      updateFields.push('game_status = ?');
+      updateValues.push(game_status);
+    }
+    if (total_progress !== undefined) {
+      updateFields.push('total_progress = ?');
+      updateValues.push(total_progress);
+    }
+    if (time_played !== undefined) {
+      updateFields.push('time_played = ?');
+      updateValues.push(time_played);
+    }
+
+    // Agregar el ID del juego al final de los valores para la cláusula WHERE
+    updateValues.push(gameId);
+
+    // Actualizar la tabla GAME
+    await connection.query(
+      `UPDATE GAME SET ${updateFields.join(', ')} WHERE id_game = ?`,
+      updateValues
+    );
+
+    res.status(200).json({
+      message: 'Juego actualizado con éxito',
+    });
+  } catch (error) {
+    console.error('Error al actualizar el juego:', error);
+    res.status(500).send('Error al actualizar el juego.');
+  } finally {
+    if (connection) connection.end();
+  }
+});
+
+
+
+app.get('/lastGame/:id_player', async (req, res) => {
+  const { id_player } = req.params;
+
+  if (!id_player) {
+    return res.status(400).send('ID de jugador no proporcionado.');
+  }
+
+  let connection;
+  try {
+    connection = await connectDB();
+
+    // Obtener la última partida del jugador
+    const [gameRows] = await connection.query(
+      'SELECT * FROM GAME WHERE id_player = ? ORDER BY last_save_date DESC LIMIT 1',
+      [id_player]
+    );
+
+    if (gameRows.length === 0) {
+      return res.status(404).send('No se encontró ninguna partida para este jugador.');
+    }
+
+    res.status(200).json(gameRows[0]);
+  } catch (error) {
+    console.error('Error al obtener la última partida:', error);
+    res.status(500).send('Error al obtener la última partida.');
+  } finally {
+    if (connection) connection.end();
+  }
+});
+
+
 // --------------------ÍTEM -------------------- //
 
 // -------------------- Obtener Inventario del Jugador -------------------- //
