@@ -202,7 +202,7 @@ app.get('/inventario/:player_id', async (req, res) => {
 
 // -------------------- Agregar Ítem al Inventario -------------------- //
 app.post('/agregarItemInventario', async (req, res) => {
-  const { player_id, item_id, quantity } = req.body;  // Ahora estamos tomando player_id y item_id de la solicitud.
+  const { player_id, item_id, quantity } = req.body;  // Ahora estamos tomando player_id y id_item  de la solicitud.
 
   let connection;
 
@@ -251,7 +251,7 @@ app.get('/inventario/:itemId', async (req, res) => {
 
   try {
     connection = await connectDB();
-    const [images] = await connection.query('SELECT image_name, image_path FROM item_image WHERE item_id = ?', [itemId]);
+    const [images] = await connection.query('SELECT image_name, image_path FROM item_image WHERE id_item = ?', [itemId]);
 
     if (images.length === 0) {
       return res.status(404).send('No se encontraron imágenes para este ítem.');
@@ -300,6 +300,31 @@ app.get('/item/:id', async (req, res) => {
   }
 });
 
+app.delete('/eliminarItemInventario', async (req, res) => {
+  const { player_id, item_id, quantity } = req.body;
+
+  let connection;
+  try {
+    connection = await connectDB();
+
+    const [result] = await connection.query(
+      `UPDATE INVENTORY SET quantity = quantity - ? 
+       WHERE player_id = ? AND id_item  = ? AND quantity >= ?`,
+      [quantity, player_id, item_id, quantity]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: 'No tienes suficientes pociones.' });
+    }
+
+    res.status(200).json({ message: 'Poción eliminada del inventario.' });
+  } catch (error) {
+    console.error('Error al eliminar el ítem:', error);
+    res.status(500).json({ message: 'Error al eliminar el ítem.' });
+  } finally {
+    if (connection) connection.end();
+  }
+});
 
 
 server.listen(port, () => {
