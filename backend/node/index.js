@@ -282,16 +282,21 @@ app.put('/updateInventory/:playerId', async (req, res) => {
 
 
 //-------------------- actualizar GAME -------------------- //
-app.put('/updateGame/:gameId', async (req, res) => {
-  const { gameId } = req.params;
+app.put('/updateGame/:nickname', async (req, res) => {
+  const { nickname } = req.params;
   const {
     game_name,
     game_status,
     total_progress,
     time_played,
+    position_x,
+    position_y,
+    health,
+    coins
   } = req.body;
 
-  if (!game_name && !game_status && total_progress === undefined && time_played === undefined) {
+  if (!game_name && !game_status && total_progress === undefined && time_played === undefined &&
+      position_x === undefined && position_y === undefined && health === undefined && coins === undefined) {
     return res.status(400).send('No se proporcionaron datos para actualizar.');
   }
 
@@ -300,10 +305,18 @@ app.put('/updateGame/:gameId', async (req, res) => {
   try {
     connection = await connectDB();
 
-    // Buscar el juego por su ID
-    const [gameRows] = await connection.query('SELECT * FROM GAME WHERE id_game = ?', [gameId]);
+    // Obtener el id_player a partir del nickname
+    const [playerRows] = await connection.query('SELECT id_player FROM PLAYER WHERE nickname = ?', [nickname]);
+    if (playerRows.length === 0) {
+      return res.status(404).send('Jugador no encontrado.');
+    }
+
+    const id_player = playerRows[0].id_player;
+
+    // Buscar el juego asociado al id_player
+    const [gameRows] = await connection.query('SELECT * FROM GAME WHERE id_player = ?', [id_player]);
     if (gameRows.length === 0) {
-      return res.status(404).send('Juego no encontrado.');
+      return res.status(404).send('Juego no encontrado para este jugador.');
     }
 
     const updateFields = [];
@@ -326,22 +339,108 @@ app.put('/updateGame/:gameId', async (req, res) => {
       updateFields.push('time_played = ?');
       updateValues.push(time_played);
     }
+    if (position_x !== undefined) {
+      updateFields.push('position_x = ?');
+      updateValues.push(position_x);
+    }
+    if (position_y !== undefined) {
+      updateFields.push('position_y = ?');
+      updateValues.push(position_y);
+    }
+    if (health !== undefined) {
+      updateFields.push('health = ?');
+      updateValues.push(health);
+    }
+    if (coins !== undefined) {
+      updateFields.push('coins = ?');
+      updateValues.push(coins);
+    }
 
-    // Agregar el ID del juego al final de los valores para la cláusula WHERE
-    updateValues.push(gameId);
+    if (updateFields.length === 0) {
+      return res.status(400).send('No hay campos válidos para actualizar.');
+    }
+
+    // Agregar el ID del jugador al final de los valores para la cláusula WHERE
+    updateValues.push(id_player);
 
     // Actualizar la tabla GAME
     await connection.query(
-      `UPDATE GAME SET ${updateFields.join(', ')} WHERE id_game = ?`,
+      `UPDATE GAME SET ${updateFields.join(', ')} WHERE id_player = ?`,
       updateValues
     );
 
     res.status(200).json({
-      message: 'Juego actualizado con éxito',
+      message: `Juego del jugador ${nickname} actualizado con éxito`,
     });
+
   } catch (error) {
     console.error('Error al actualizar el juego:', error);
     res.status(500).send('Error al actualizar el juego.');
+  } finally {
+    if (connection) connection.end();
+  }
+});
+
+
+//-------------------- cargar GAME -------------------- //
+
+app.get('/loadGame/:nickname', async (req, res) => {
+  const { nickname } = req.params;
+
+  if (!nickname) {
+    return res.status(400).send('Nickname no proporcionado.');
+  }
+
+  let connection;
+
+  try {
+    connection = await connectDB();
+
+    // Buscar ID del jugador
+    const [playerRows] = await connection.query(
+      'SELECT id_player FROM PLAYER WHERE nickname = ?', [nickname]
+    );
+
+    if (playerRows.length === 0) {
+      return res.status(404).send('Jugador no encontrado.');
+    }
+
+    const playerId = playerRows[0].id_player;
+
+    // Buscar la partida del jugador
+    const [gameRows] = await connection.query(
+      'SELECT * FROM GAME WHERE id_player = ?', [playerId]
+    );
+
+    if (gameRows.length === 0) {
+      return res.status(404).send('No hay partida guardada para este jugador.');
+    }
+
+    const gameData = gameRows[0];
+
+    // Obtener el inventario del jugador
+    const [inventoryRows] = await connection.query(
+      'SELECT id_item, quantity FROM INVENTORY WHERE id_inventory = ?', [gameData.id_inventory]
+    );
+
+    res.status(200).json({
+      message: 'Partida cargada con éxito',
+      game: {
+        gameId: gameData.id_game,
+        gameName: gameData.game_name,
+        gameStatus: gameData.game_status,
+        totalProgress: gameData.total_progress,
+        timePlayed: gameData.time_played,
+        position_x: gameData.position_x,
+        position_y: gameData.position_y,
+        health: gameData.health,
+        coins: gameData.coins,
+        inventory: inventoryRows,
+      },
+    });
+  } catch (error) {
+    console.error('Error al cargar la partida:', error);
+    res.status(500).send('Error al cargar la partida.');
   } finally {
     if (connection) connection.end();
   }
