@@ -12,9 +12,9 @@ const cors = require('cors');  // Importa cors
 // -------------------- CONSTANTES -------------------- //
 
 /* Crear la base de datos a partir del archivo configDB.js */
-// (async () => { 
-//   await createDB();
-//  })();
+ (async () => { 
+   await createDB();
+  })();
 
 // CONEXIÓN A LA BASE DE DATOS
 const dataConnection = {
@@ -212,7 +212,7 @@ app.post('/newGame', async (req, res) => {
     let inventoryId;
     if (inventoryRows.length === 0) {
       const [inventoryResult] = await connection.query(
-        'INSERT INTO INVENTORY (id_item, quantity) VALUES (?, ?)', [1, 1]
+        'INSERT INTO INVENTORY ( player_id, id_item, quantity) VALUES (?, ?, ?)', [playerId, 1, 1]
       );
       inventoryId = inventoryResult.insertId;
     } else {
@@ -246,10 +246,10 @@ app.post('/newGame', async (req, res) => {
 
 //-------------------- borrar GAME -------------------- //
 
-app.delete('/deleteGame/:id_game', async (req, res) => {
-  const { id_game } = req.params;
+app.delete('/deleteGame/:nickname', async (req, res) => {
+  const { nickname } = req.params;
 
-  if (!id_game) {
+  if (!nickname) {
     return res.status(400).send('ID de juego no proporcionado.');
   }
 
@@ -257,14 +257,22 @@ app.delete('/deleteGame/:id_game', async (req, res) => {
   try {
     connection = await connectDB();
 
+    // Obtener el id_player a partir del nickname
+    const [playerRows] = await connection.query('SELECT id_player FROM PLAYER WHERE nickname = ?', [nickname]);
+    if (playerRows.length === 0) {
+      return res.status(404).send('Jugador no encontrado.');
+    }
+
+    const id_player = playerRows[0].id_player;
+
     // Verificar si el juego existe
-    const [gameRows] = await connection.query('SELECT * FROM GAME WHERE id_game = ?', [id_game]);
+    const [gameRows] = await connection.query('SELECT * FROM GAME WHERE id_player = ?', [id_player]);
     if (gameRows.length === 0) {
       return res.status(404).send('Juego no encontrado.');
     }
 
     // Eliminar el juego (las restricciones ON DELETE CASCADE se encargan de las referencias)
-    await connection.query('DELETE FROM GAME WHERE id_game = ?', [id_game]);
+    await connection.query('DELETE FROM GAME WHERE id_player = ?', [id_player]);
 
     res.status(200).json({ message: 'Juego eliminado con éxito' });
   } catch (error) {
@@ -278,8 +286,8 @@ app.delete('/deleteGame/:id_game', async (req, res) => {
 
 //-------------------- actualizar INVENTORY -------------------- //
 
-app.put('/updateInventory/:playerId', async (req, res) => {
-  const { playerId } = req.params;
+app.put('/updateInventory/:nickname', async (req, res) => {
+  const { nickname } = req.params;
   const { id_item, quantity } = req.body;
 
   if (!id_item || quantity === undefined) {
@@ -291,14 +299,16 @@ app.put('/updateInventory/:playerId', async (req, res) => {
   try {
     connection = await connectDB();
 
-    // Verificar si el jugador existe
-    const [playerRows] = await connection.query('SELECT id_player FROM PLAYER WHERE id_player = ?', [playerId]);
+    // Obtener el id_player a partir del nickname
+    const [playerRows] = await connection.query('SELECT id_player FROM PLAYER WHERE nickname = ?', [nickname]);
     if (playerRows.length === 0) {
       return res.status(404).send('Jugador no encontrado.');
     }
 
+    const id_player = playerRows[0].id_player;
+
     // Verificar si el jugador tiene un inventario
-    const [inventoryRows] = await connection.query('SELECT id_inventory FROM INVENTORY WHERE id_item = ? AND id_inventory IN (SELECT id_inventory FROM GAME WHERE id_player = ?)', [id_item, playerId]);
+    const [inventoryRows] = await connection.query('SELECT id_inventory FROM INVENTORY WHERE id_item = ? AND id_inventory IN (SELECT id_inventory FROM GAME WHERE id_player = ?)', [id_item, id_player]);
     
     if (inventoryRows.length === 0) {
       return res.status(404).send('Inventario no encontrado para este jugador.');
@@ -495,10 +505,10 @@ app.get('/loadGame/:nickname', async (req, res) => {
 
 
 
-app.get('/lastGame/:id_player', async (req, res) => {
-  const { id_player } = req.params;
+app.get('/lastGame/:nickname', async (req, res) => {
+  const { nickname } = req.params;
 
-  if (!id_player) {
+  if (!nickname) {
     return res.status(400).send('ID de jugador no proporcionado.');
   }
 
@@ -506,10 +516,22 @@ app.get('/lastGame/:id_player', async (req, res) => {
   try {
     connection = await connectDB();
 
+
+    // Buscar ID del jugador
+    const [playerRows] = await connection.query(
+      'SELECT id_player FROM PLAYER WHERE nickname = ?', [nickname]
+    );
+
+    if (playerRows.length === 0) {
+      return res.status(404).send('Jugador no encontrado.');
+    }
+
+    const playerId = playerRows[0].id_player;
+
     // Obtener la última partida del jugador
     const [gameRows] = await connection.query(
       'SELECT * FROM GAME WHERE id_player = ? ORDER BY last_save_date DESC LIMIT 1',
-      [id_player]
+      [playerId]
     );
 
     if (gameRows.length === 0) {
@@ -529,14 +551,27 @@ app.get('/lastGame/:id_player', async (req, res) => {
 // --------------------ÍTEM -------------------- //
 
 // -------------------- Obtener Inventario del Jugador -------------------- //
-app.get('/inventario/:player_id', async (req, res) => {
-  const { player_id } = req.params;
+app.get('/inventario/:nickname', async (req, res) => {
+  const { nickname } = req.params;
   
   let connection;
   
   try {
       connection = await connectDB();
       
+
+      // Buscar ID del jugador
+    const [playerRows] = await connection.query(
+      'SELECT id_player FROM PLAYER WHERE nickname = ?', [nickname]
+    );
+
+    if (playerRows.length === 0) {
+      return res.status(404).send('Jugador no encontrado.');
+    }
+
+    const playerId = playerRows[0].id_player;
+
+    
       const [rows] = await connection.query(
           `SELECT 
               i.id_item, 
@@ -550,7 +585,7 @@ app.get('/inventario/:player_id', async (req, res) => {
           FROM INVENTORY pi
           JOIN ITEM i ON pi.id_item = i.id_item
           WHERE pi.player_id = ?`,
-          [player_id]
+          [playerId]
       );
       
       if (rows.length === 0) {
