@@ -480,6 +480,8 @@ app.get('/loadGame/:nickname', async (req, res) => {
       'SELECT id_item, quantity FROM INVENTORY WHERE id_inventory = ?', [gameData.id_inventory]
     );
 
+    console.log("partida cargada con eixto", gameData);
+
     res.status(200).json({
       message: 'Partida cargada con éxito',
       game: {
