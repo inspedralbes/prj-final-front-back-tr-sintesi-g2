@@ -8,9 +8,21 @@ const Player = sequelize.define('Player', {
     autoIncrement: true
   },
   nickname: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(50),
     allowNull: false,
     unique: true
+  },
+  creation_date: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  total_time_played: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  achievements_unlocked: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
   }
 }, {
   tableName: 'PLAYER',

@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Player = require('./Player');
+const Inventory = require('./Inventory');
 
 const Game = sequelize.define('Game', {
   id_game: {
@@ -16,35 +17,47 @@ const Game = sequelize.define('Game', {
       key: 'id_player'
     }
   },
+  id_inventory: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Inventory,
+      key: 'id_inventory'
+    }
+  },
   game_name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(50),
     allowNull: false
   },
   game_status: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('active', 'completed'),
     defaultValue: 'active'
   },
   total_progress: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.DECIMAL(5, 2),
     defaultValue: 0.00
   },
-  time_played: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
+  last_save_date: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   },
   position_x: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.DECIMAL(10, 2),
     defaultValue: 0
   },
   position_y: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.DECIMAL(10, 2),
     defaultValue: 0
   },
   health: {
     type: DataTypes.INTEGER,
-    defaultValue: 100
+    defaultValue: 70
   },
   coins: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  time_played: {
     type: DataTypes.INTEGER,
     defaultValue: 0
   }
@@ -53,7 +66,25 @@ const Game = sequelize.define('Game', {
   timestamps: false
 });
 
-Game.belongsTo(Player, { foreignKey: 'id_player' });
-Player.hasMany(Game, { foreignKey: 'id_player' });
+// Definir las relaciones
+Game.belongsTo(Player, { 
+  foreignKey: 'id_player',
+  onDelete: 'CASCADE'
+});
+
+Game.belongsTo(Inventory, {
+  foreignKey: 'id_inventory',
+  onDelete: 'CASCADE'
+});
+
+Player.hasMany(Game, { 
+  foreignKey: 'id_player',
+  onDelete: 'CASCADE'
+});
+
+Inventory.hasMany(Game, {
+  foreignKey: 'id_inventory',
+  onDelete: 'CASCADE'
+});
 
 module.exports = Game;

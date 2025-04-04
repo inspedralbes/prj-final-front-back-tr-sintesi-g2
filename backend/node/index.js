@@ -14,7 +14,7 @@ require('dotenv').config({ path: './environment/.env' });
 // Inicializar base de datos y servicios
 (async () => {
   try {
-    await createDB();
+    //await createDB();
     await sequelize.authenticate();
     console.log('Conexión a la base de datos establecida correctamente.');
 
