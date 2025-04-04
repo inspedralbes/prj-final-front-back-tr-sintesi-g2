@@ -1,7 +1,7 @@
 // -------------------- CONSTANTES -------------------- //  
 
 const mysql = require('mysql2/promise');
-const createDB = require('./configDB');
+const createDB = require('./data/config/configDB');
 const express = require('express');
 const app = express();
 const { createServer } = require('http');

@@ -26,9 +26,9 @@ const connection = mysql.createConnection({
 const dataBaseName = process.env.DB_NAMELH;*/
 
 
-const sqlFileCrateDB = path.join(__dirname, '.', 'data', 'createDB.sql');
+const sqlFileCrateDB = path.join(__dirname, '..', 'createDB.sql');
 const fileCreateSQL = fs.readFileSync(sqlFileCrateDB, 'utf8');
-const sqlFileInsertDB = path.join(__dirname, '.', 'data', 'insertDataDB.sql');
+const sqlFileInsertDB = path.join(__dirname, '..', 'insertDataDB.sql');
 const fileInsertSQL = fs.readFileSync(sqlFileInsertDB, 'utf8');
 
 async function createDB() {
