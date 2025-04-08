@@ -1,8 +1,8 @@
 FROM node:18-alpine
 
-WORKDIR /app/backend
+WORKDIR /app/frontend/vuetify-project
 
-COPY package*.json ./
+COPY ./vuetify-project/package*.json ./
 
 RUN npm install
 

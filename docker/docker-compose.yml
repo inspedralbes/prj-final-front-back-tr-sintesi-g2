@@ -20,90 +20,46 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./mysql_data:/var/lib/mysql
-    # healthcheck:
-    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 3
-    networks:
-      - trFinal_network
-
-  # mongodb:
-  #   image: mongo
-  #   container_name: mongo
-  #   env_file:
-  #     - ./back/environment/.env
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: root
-  #     MONGO_INITDB_ROOT_PASSWORD: example
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - mongo_data:/data/db
-  #   restart: unless-stopped
-  #   networks:
-  #     - tr3_network
-  #   healthcheck:
-  #     test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 3
-
-  # mongo-express:
-  #   image: mongo-express
-  #   container_name: tr3_mongo_express
-  #   ports:
-  #     - "8081:8081"
-  #   env_file:
-  #     - ./back/environment/.env
-  #   environment:
-  #     ME_CONFIG_BASICAUTH_USERNAME: root
-  #     ME_CONFIG_BASICAUTH_PASSWORD: example
-  #     ME_CONFIG_MONGODB_AUTH_DATABASE: tr3_mongo_db  # Base de datos para autenticación
-  #     ME_CONFIG_MONGODB_AUTH_USERNAME: root  # Usuario de MongoDB
-  #     ME_CONFIG_MONGODB_AUTH_PASSWORD: example  # Contraseña de MongoDB
-  #     ME_CONFIG_MONGODB_URL: "mongodb://root:example@mongo:27017"
-
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - mongodb
-  #   networks:
-  #     - tr3_network
-
-  frontend:
-    build:
-    dockerfile: dev.back.Dockerfile
-    container_name: trFinal_frontend
-    restart: always
-    ports:
-      - "4000:4000"
-    volumes:
-      - ./front/vuetify-project:/app/frontend  # Monta el código dentro del contenedor
-      - /app/frontend/node_modules  # Evita sobrescribir node_modules
-    depends_on:
-      - backend
+      - ../mysql_data:/var/lib/mysql
     networks:
       - trFinal_network
 
   backend:
     build:
-      dockerfile: dev.back.Dockerfile
+      context: ../backend
+      dockerfile: ../docker/dev.back.Dockerfile
     container_name: trFinal_backend
     restart: always
     ports:
       - "3000:3000"
-    networks:
-      - trFinal_network
+    volumes:
+      - ../backend:/app/backend
+      - /app/backend/node_modules
     depends_on:
       - mysql
+    command: sh -c "npm install && npm run dev"
+    networks:
+      - trFinal_network
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/dev.front.Dockerfile
+    container_name: trFinal_frontend
+    restart: always
+    ports:
+      - "4000:4000"
     volumes:
-      - ./back/routes:/app/backend/routes  # Monta el código dentro del contenedor
-    command: sh -c "npm run dev"
+      - ../frontend/vuetify-project:/app/frontend
+      - /app/frontend/node_modules
+    depends_on:
+      - backend
+    networks:
+      - trFinal_network
 
 networks:
   trFinal_network:
-    # Definición de la red
     driver: bridge
+
 volumes:
   mysql_data:
