@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../models/User');
+const cors = require('cors');
 
 const startUserService = () => {
   const app = express();
@@ -40,7 +41,7 @@ const startUserService = () => {
     }
   });
 
-  const port = process.env.USER_SERVICE_PORT || 3001;
+  const port = process.env.USER_PORT || 3004;
   app.listen(port, () => {
     console.log(`User service running on port ${port}`);
   });

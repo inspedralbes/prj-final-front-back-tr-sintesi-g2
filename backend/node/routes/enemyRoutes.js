@@ -1,5 +1,6 @@
 const express = require('express');
 const Enemy = require('../models/Enemy');
+const cors = require('cors');
 
 const startEnemyService = () => {
   const app = express();
@@ -30,7 +31,7 @@ const startEnemyService = () => {
     }
   });
 
-  const port = process.env.ENEMY_SERVICE_PORT || 3002;
+  const port = process.env.ENEMY_PORT || 3007;
   app.listen(port, () => {
     console.log(`Enemy service running on port ${port}`);
   });

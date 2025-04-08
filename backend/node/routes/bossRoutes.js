@@ -1,5 +1,6 @@
 const express = require('express');
 const Boss = require('../models/Boss');
+const cors = require('cors');
 
 const startBossService = () => {
   const app = express();
@@ -45,7 +46,7 @@ const startBossService = () => {
     }
   });
 
-  const port = process.env.BOSS_SERVICE_PORT || 3003;
+  const port = process.env.BOSS_PORT;
   app.listen(port, () => {
     console.log(`Boss service running on port ${port}`);
   });

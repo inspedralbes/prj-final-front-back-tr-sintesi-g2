@@ -1,5 +1,4 @@
 const { createServer } = require('http');
-const cors = require('cors');
 const path = require('path');
 const sequelize = require('./config/database');
 const createDB = require('./configDB');
