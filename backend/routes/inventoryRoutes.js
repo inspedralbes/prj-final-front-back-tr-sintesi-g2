@@ -1,8 +1,48 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const router = express.Router();
 const Player = require('../models/Player');
 const Inventory = require('../models/Inventory');
 const Item = require('../models/Item');
+
+// Crear el servidor de express para el servicio de inventario
+const app = express();
+app.use(express.json());
+app.use(require('cors')());
+app.use('/', router);
+
+// Crear el servidor HTTP basado en express
+const server = http.createServer(app);
+
+// Inicializar Socket.IO en el servidor HTTP
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Permitir conexiones desde cualquier origen (ajustar según necesidades)
+    methods: ["GET", "POST", "DELETE"]
+  }
+});
+
+// Configurar Socket.IO
+io.on('connection', (socket) => {
+  console.log('Cliente conectado:', socket.id);
+
+  // El cliente puede subscribirse al inventario de un jugador específico
+  socket.on('subscribe_inventory', (nickname) => {
+    console.log(`Cliente ${socket.id} subscrito al inventario de ${nickname}`);
+    socket.join(`inventory_${nickname}`);
+  });
+
+  // Desuscribirse del inventario de un jugador
+  socket.on('unsubscribe_inventory', (nickname) => {
+    console.log(`Cliente ${socket.id} desuscrito del inventario de ${nickname}`);
+    socket.leave(`inventory_${nickname}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Cliente desconectado:', socket.id);
+  });
+});
 
 // Obtener inventario del jugador por nickname
 router.get('/inventory/:nickname', async (req, res) => {
@@ -61,6 +101,25 @@ router.post('/addItem', async (req, res) => {
       });
     }
 
+    // Obtener información del jugador para las notificaciones
+    const player = await Player.findByPk(player_id);
+    if (player) {
+      // Obtener información del ítem añadido
+      const item = await Item.findByPk(item_id);
+      if (item) {
+        // Emitir evento a los clientes suscritos al inventario de este jugador
+        io.to(`inventory_${player.nickname}`).emit('inventory_updated', {
+          action: 'add',
+          player_id,
+          player_nickname: player.nickname,
+          item_id,
+          item_name: item.item_name,
+          quantity,
+          new_quantity: created ? quantity : inventory.quantity + quantity
+        });
+      }
+    }
+
     res.status(200).json({ message: 'Ítem añadido al inventario.' });
   } catch (error) {
     console.error('Error al agregar el ítem al inventario:', error);
@@ -81,12 +140,35 @@ router.delete('/removeItem', async (req, res) => {
       return res.status(400).json({ message: 'No hay suficientes unidades del ítem.' });
     }
 
-    if (inventory.quantity === quantity) {
+    const finalQuantity = inventory.quantity - quantity;
+    const action = finalQuantity === 0 ? 'remove' : 'decrease';
+
+    // Obtener información del jugador para las notificaciones
+    const player = await Player.findByPk(player_id);
+    
+    if (finalQuantity === 0) {
       await inventory.destroy();
     } else {
       await inventory.update({
-        quantity: inventory.quantity - quantity
+        quantity: finalQuantity
       });
+    }
+
+    if (player) {
+      // Obtener información del ítem eliminado
+      const item = await Item.findByPk(item_id);
+      if (item) {
+        // Emitir evento a los clientes suscritos al inventario de este jugador
+        io.to(`inventory_${player.nickname}`).emit('inventory_updated', {
+          action,
+          player_id,
+          player_nickname: player.nickname,
+          item_id,
+          item_name: item.item_name,
+          quantity_removed: quantity,
+          new_quantity: finalQuantity
+        });
+      }
     }
 
     res.status(200).json({ message: 'Ítem eliminado del inventario.' });
@@ -114,17 +196,12 @@ router.get('/item/:itemId', async (req, res) => {
   }
 });
 
-// Crear el servidor de express para el servicio de inventario
-const app = express();
-app.use(express.json());
-app.use(require('cors')());
-app.use('/', router);
-
 const INVENTORY_PORT = process.env.INVENTORY_PORT || 3003;
 
 function startInventoryService() {
-  app.listen(INVENTORY_PORT, () => {
+  server.listen(INVENTORY_PORT, () => {
     console.log(`Servicio de inventario corriendo en el puerto ${INVENTORY_PORT}`);
+    console.log(`Socket.IO escuchando para conexiones en tiempo real`);
   });
 }
 
