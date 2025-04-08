@@ -58,44 +58,38 @@ CREATE TABLE GAME (
     FOREIGN KEY (id_inventory) REFERENCES INVENTORY(id_inventory) ON DELETE CASCADE
 );
 
--- CREAR TABLA ENEMY
+-- CREAR TABLA ENEMY (MODIFICADA CON ESTADÍSTICAS SIN VALORES POR DEFECTO)
 CREATE TABLE ENEMY (
     id_enemy INT AUTO_INCREMENT PRIMARY KEY,
     enemy_name VARCHAR(50) NOT NULL,
-    enemy_type ENUM('common', 'elite', 'boss') DEFAULT 'common', -- Tipo de enemigo
-    health INT NOT NULL,
-    attack_power INT NOT NULL,
-    defense INT NOT NULL,
-    money_reward INT NOT NULL -- Recompensa en dinero al derrotarlo
+    move_speed FLOAT NOT NULL,
+    enemy_max_health INT NOT NULL,
+    follow_range FLOAT NOT NULL,
+    attack_range FLOAT NOT NULL,
+    hit_damage INT NOT NULL,
+    attack_damage INT NOT NULL,
+    second_attack_damage INT NOT NULL,
+    block_chance FLOAT,
+    reduced_damage INT,
+    attack_cooldown FLOAT NOT NULL,
+    coin_reward INT NOT NULL
 );
 
--- CREAR TABLA INTERACTABLE_OBJECTS
-CREATE TABLE INTERACTABLE_OBJECTS (
-    id_object INT AUTO_INCREMENT PRIMARY KEY,
-    object_name VARCHAR(50) NOT NULL,
-    object_type ENUM('door', 'chest', 'npc', 'trap') NOT NULL, -- Tipo de objeto
-    interaction_required ENUM('yes', 'no') DEFAULT 'yes', -- Si el jugador debe interactuar
-    reward INT DEFAULT NULL -- Recompensa asociada, si aplica
-);
-
--- CREAR TABLA BOSSES
+-- CREAR TABLA BOSSES (CON ESTADÍSTICAS SIN VALORES POR DEFECTO)
 CREATE TABLE BOSSES (
     id_boss INT AUTO_INCREMENT PRIMARY KEY,
+    id_game INT NOT NULL,
     boss_name VARCHAR(50) NOT NULL,
-    health INT NOT NULL,
-    attack_power INT NOT NULL,
-    defense INT NOT NULL,
-    location VARCHAR(100), -- Lugar donde se encuentra
-    reward_item INT, -- ID del ítem de recompensa
-    FOREIGN KEY (reward_item) REFERENCES ITEM(id_item) ON DELETE SET NULL
-);
-
--- CREAR TABLA GAME_BOSSES
-CREATE TABLE GAME_BOSSES (
-    id_game_boss INT AUTO_INCREMENT PRIMARY KEY,
-    id_game INT NOT NULL, -- Relación con el juego
-    id_boss INT NOT NULL, -- Relación con el jefe
-    defeated_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Fecha de derrota
-    FOREIGN KEY (id_game) REFERENCES GAME(id_game) ON DELETE CASCADE,
-    FOREIGN KEY (id_boss) REFERENCES BOSSES(id_boss) ON DELETE CASCADE
+    boss_max_health INT NOT NULL,
+    move_speed FLOAT NOT NULL,
+    attack_range FLOAT NOT NULL,
+    attack_cooldown FLOAT NOT NULL,
+    attack1_damage INT NOT NULL,
+    attack2_damage INT NOT NULL,
+    vision_range FLOAT NOT NULL,
+    location VARCHAR(100),
+    reward_item INT,
+    is_defeated BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (reward_item) REFERENCES ITEM(id_item) ON DELETE SET NULL,
+    FOREIGN KEY (id_game) REFERENCES GAME(id_game) ON DELETE CASCADE
 );

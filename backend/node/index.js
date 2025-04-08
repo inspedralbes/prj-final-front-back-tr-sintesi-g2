@@ -8,13 +8,16 @@ const createDB = require('./configDB');
 const { startPlayerService } = require('./routes/playerRoutes');
 const { startGameService } = require('./routes/gameRoutes');
 const { startInventoryService } = require('./routes/inventoryRoutes');
+const { startUserService } = require('./routes/userRoutes');
+const { startEnemyService } = require('./routes/enemyRoutes');
+const { startBossService } = require('./routes/bossRoutes')
 
 require('dotenv').config({ path: './environment/.env' });
 
 // Inicializar base de datos y servicios
 (async () => {
   try {
-    //await createDB();
+    await createDB();
     await sequelize.authenticate();
     console.log('Conexión a la base de datos establecida correctamente.');
 
@@ -22,6 +25,9 @@ require('dotenv').config({ path: './environment/.env' });
     startPlayerService();
     startGameService();
     startInventoryService();
+    startUserService();
+    startEnemyService();
+    startBossService();
     
     console.log('Todos los servicios iniciados correctamente');
   } catch (error) {
