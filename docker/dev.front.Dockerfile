@@ -1,15 +1,21 @@
 FROM node:18-alpine
 
-WORKDIR /app/frontend/vuetify-project
+# Ruta de trabajo más clara
+WORKDIR /app
 
-COPY ./vuetify-project/package*.json ./
+# Copiar solo package.json y lock para mejor caching
+COPY vuetify-project/package*.json ./vuetify-project/
 
+# Ir al directorio correcto e instalar
+WORKDIR /app/vuetify-project
 RUN npm install
 
-COPY . .
+# Copiar el resto del proyecto
+COPY vuetify-project/. .
 
-EXPOSE 3000
+# No necesitas nodemon en el frontend, salvo que estés haciendo otra cosa
+# RUN npm install -g nodemon  ❌ innecesario aquí
 
-RUN npm install -g nodemon
+EXPOSE 4000
 
 CMD ["npm", "run", "dev"]
