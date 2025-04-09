@@ -30,12 +30,13 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    working_dir: /app/backend
     volumes:
       - ../backend:/app/backend
-      # - /app/backend/node_modules
+      - /app/backend/node_modules
     depends_on:
       - mysql
-    command: sh -c "npm install && sleep 10 && npm run dev"
+    command: sh -c "sleep 10 && npm install && npm run dev"
     networks:
       - trFinal_network
 
@@ -45,12 +46,13 @@ services:
     restart: always
     ports:
       - "4000:4000"
+    working_dir: /app/frontend
     volumes:
       - ../frontend/vuetify-project:/app/frontend
-      # - /app/frontend/node_modules
+      - /app/frontend/node_modules
     depends_on:
       - backend
-    command: sh -c "sleep 11 && npm run dev"
+    command: sh -c "sleep 15 && npm install && npm run dev"
     networks:
       - trFinal_network
 
