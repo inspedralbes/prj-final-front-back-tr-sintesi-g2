@@ -25,35 +25,32 @@ services:
       - trFinal_network
 
   backend:
-    build:
-      context: ../backend
-      dockerfile: ../docker/dev.back.Dockerfile
+    image: node:18-alpine
     container_name: trFinal_backend
     restart: always
     ports:
       - "3000:3000"
     volumes:
       - ../backend:/app/backend
-      - /app/backend/node_modules
+      # - /app/backend/node_modules
     depends_on:
       - mysql
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "npm install && sleep 10 && npm run dev"
     networks:
       - trFinal_network
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: ../docker/dev.front.Dockerfile
+    image: node:18-alpine
     container_name: trFinal_frontend
     restart: always
     ports:
       - "4000:4000"
     volumes:
       - ../frontend/vuetify-project:/app/frontend
-      - /app/frontend/node_modules
+      # - /app/frontend/node_modules
     depends_on:
       - backend
+    command: sh -c "sleep 11 && npm run dev"
     networks:
       - trFinal_network
 
