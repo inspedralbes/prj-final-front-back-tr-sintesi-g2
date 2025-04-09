@@ -30,7 +30,7 @@ const Inventory = sequelize.define('Inventory', {
     defaultValue: 1
   }
 }, {
-  tableName: 'INVENTORY',
+  tableName: 'inventory',
   timestamps: false
 });
 

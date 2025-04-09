@@ -4,6 +4,41 @@ const Player = require('../models/Player');
 const Inventory = require('../models/Inventory');
 const Item = require('../models/Item');
 
+// Crear inventario inicial con ítems predeterminados
+router.post('/createInventory', async (req, res) => {
+  const { player_id } = req.body;
+
+  if (!player_id) {
+    return res.status(400).json({ message: 'player_id requerido' });
+  }
+
+  const initialItems = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  try {
+    const createdItems = await Promise.all(
+      initialItems.map(async (item_id) => {
+        return await Inventory.create({
+          player_id,
+          id_item: item_id,
+          quantity: 1
+        });
+      })
+    );
+
+    // Devolver solo el primero como id_inventory (o podrías devolver todos si querés)
+    const id_inventory = createdItems[0]?.id_inventory || null;
+
+    res.status(201).json({ 
+      message: 'Inventario inicial creado',
+      id_inventory,
+      items: createdItems 
+    });
+  } catch (error) {
+    console.error('Error al crear inventario:', error);
+    res.status(500).json({ message: 'Error al crear inventario.' });
+  }
+});
+
 // Obtener inventario del jugador por nickname
 router.get('/inventory/:nickname', async (req, res) => {
   const { nickname } = req.params;

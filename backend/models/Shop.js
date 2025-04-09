@@ -27,7 +27,7 @@ const Shop = sequelize.define('Shop', {
     defaultValue: true
   }
 }, {
-  tableName: 'SHOP',
+  tableName: 'shop',
   timestamps: true
 });
 

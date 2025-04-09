@@ -62,7 +62,7 @@ const startShopService = () => {
   app.post('/shop', upload.single('image'), async (req, res) => {
     try {
       const { skin_name, description, price, rarity } = req.body;
-      const image_url = req.file ? `/uploads/skins/${req.file.filename}` : null;
+      const image_url = req.file ? `/uploads/${req.file.filename}` : null;
 
       if (!skin_name || !price || !image_url) {
         return res.status(400).json({ message: 'Missing required fields' });

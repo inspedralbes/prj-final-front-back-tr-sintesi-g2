@@ -53,6 +53,9 @@ const Enemy = sequelize.define('Enemy', {
     type: DataTypes.INTEGER,
     allowNull: false
   }
+},{
+  tableName: 'enemy',
+  timestamps: false
 });
 
 module.exports = Enemy;

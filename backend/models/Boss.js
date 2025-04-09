@@ -53,6 +53,9 @@ const Boss = sequelize.define('Boss', {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   }
+},{
+  tableName: 'boss',
+  timestamps: false
 });
 
 // Define associations

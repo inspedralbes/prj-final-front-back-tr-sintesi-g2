@@ -62,7 +62,7 @@ const Game = sequelize.define('Game', {
     defaultValue: 0
   }
 }, {
-  tableName: 'GAME',
+  tableName: 'game',
   timestamps: false
 });
 

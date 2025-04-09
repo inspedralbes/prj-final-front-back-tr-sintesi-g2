@@ -35,6 +35,9 @@ const User = sequelize.define('User', {
   last_login: {
     type: DataTypes.DATE
   }
+}, {
+  tableName: 'user',
+  timestamps: false
 });
 
 module.exports = User;
