@@ -31,8 +31,8 @@ const startBossService = () => {
     }
   });
 
-  // Update boss status
-  app.patch('/bosses/:id', async (req, res) => {
+  // Update boss statistics
+  app.put('/bosses/:id', async (req, res) => {
     try {
       const boss = await Boss.findByPk(req.params.id);
       if (boss) {

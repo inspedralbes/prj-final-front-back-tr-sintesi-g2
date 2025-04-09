@@ -39,6 +39,35 @@ router.post('/loginPlayer', async (req, res) => {
   }
 });
 
+// Get all players
+router.get('/players', async (req, res) => {
+  try {
+    const players = await Player.findAll();
+    res.status(200).json(players);
+  } catch (error) {
+    console.error('Error al obtener jugadores:', error);
+    res.status(500).send('Error al obtener jugadores.');
+  }
+});
+
+// Delete player
+router.delete('/player/:id', async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const player = await Player.findByPk(id);
+    if (!player) {
+      return res.status(404).send('Jugador no encontrado.');
+    }
+    
+    await player.destroy();
+    res.status(200).json({ message: 'Jugador eliminado con éxito.' });
+  } catch (error) {
+    console.error('Error al eliminar jugador:', error);
+    res.status(500).send('Error al eliminar jugador.');
+  }
+});
+
 // Crear el servidor de express para el servicio de jugadores
 const app = express();
 app.use(express.json());

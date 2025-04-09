@@ -30,6 +30,14 @@ services:
     restart: always
     ports:
       - "3000:3000"
+      - "3001:3001"
+      - "3002:3002"
+      - "3003:3003"
+      - "3004:3004"
+      - "3006:3006"
+      - "3007:3007"
+      - "3008:3008"
+      - "3009:3009"
     working_dir: /app/backend
     volumes:
       - ../backend:/app/backend

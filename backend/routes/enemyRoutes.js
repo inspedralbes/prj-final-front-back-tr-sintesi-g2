@@ -31,6 +31,21 @@ const startEnemyService = () => {
     }
   });
 
+  // Update enemy statistics
+  app.put('/enemies/:id', async (req, res) => {
+    try {
+      const enemy = await Enemy.findByPk(req.params.id);
+      if (enemy) {
+        await enemy.update(req.body);
+        res.json(enemy);
+      } else {
+        res.status(404).json({ message: 'Enemy not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   const port = process.env.ENEMY_PORT || 3007;
   app.listen(port, () => {
     console.log(`Enemy service running on port ${port}`);

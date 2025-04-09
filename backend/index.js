@@ -10,6 +10,7 @@ const { startInventoryService } = require('./routes/inventoryRoutes');
 const { startUserService } = require('./routes/userRoutes');
 const { startEnemyService } = require('./routes/enemyRoutes');
 const { startBossService } = require('./routes/bossRoutes')
+const { startShopService } = require('./routes/shopRoutes')
 
 require('dotenv').config({ path: './environment/.env' });
 
@@ -27,6 +28,7 @@ require('dotenv').config({ path: './environment/.env' });
     startUserService();
     startEnemyService();
     startBossService();
+    startShopService();
     
     console.log('Todos los servicios iniciados correctamente');
   } catch (error) {
