@@ -105,8 +105,8 @@ export default {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
 
-        // Redirigir al usuario
-        this.$router.push('/');
+        // Redirigir al usuario al dashboard
+        this.$router.push('/dashboard');
       } catch (error) {
         this.error = error.message || 'Error al iniciar sesión';
       } finally {

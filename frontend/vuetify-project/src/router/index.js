@@ -8,11 +8,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginComponent from '@/components/login.vue'
 import RegisterComponent from '@/components/register.vue'
+import Dashboard from '@/components/Dashboard.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/login'
+    redirect: () => {
+      return localStorage.getItem('token') ? '/dashboard' : '/login'
+    }
   },
   {
     path: '/login',
@@ -23,6 +26,12 @@ const routes = [
     path: '/register',
     name: 'register',
     component: RegisterComponent
+  },
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: Dashboard,
+    meta: { requiresAuth: true }
   }
 ]
 

@@ -50,7 +50,15 @@ export default defineConfig({
   },
   server: {
     port: 4000,
+    
+    host: true,
+
+    watch: {
+      usePolling: true,
+    },
   },
+
+
   css: {
     preprocessorOptions: {
       sass: {
