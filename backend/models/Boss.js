@@ -41,18 +41,14 @@ const Boss = sequelize.define('Boss', {
   },
   reward_item: {
     type: DataTypes.INTEGER
-  },
-},{
+  }
+}, {
   tableName: 'boss',
   timestamps: false
 });
 
-// Define associations
+// Define associations (solo si hay otras)
 Boss.associate = (models) => {
-  Boss.belongsTo(models.Game, {
-    foreignKey: 'id_game',
-    onDelete: 'CASCADE'
-  });
   Boss.belongsTo(models.Item, {
     foreignKey: 'reward_item',
     onDelete: 'SET NULL'
