@@ -2,6 +2,7 @@ const { createServer } = require('http');
 const path = require('path');
 const sequelize = require('./config/database');
 const ensureDatabaseExists = require('./config/ensureDB');
+const seedItems = require('./inserts/seedItems');
 
 // Servicios
 const { startPlayerService } = require('./routes/playerRoutes');
@@ -19,6 +20,7 @@ require('dotenv').config({ path: './environment/.env' });
     await ensureDatabaseExists(); // 👈 esto crea la DB si no existe
     await sequelize.authenticate();
     console.log('Conexión a la base de datos establecida correctamente.');
+    // await seedItems(); // 👈 esto inserta los items en la DB
     await sequelize.sync({ force: false }); // 👈 esto sincroniza los modelos con la DB
 
     // Iniciar microservicios
