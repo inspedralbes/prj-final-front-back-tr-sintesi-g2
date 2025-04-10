@@ -84,7 +84,7 @@ export default {
         this.loading = true;
         this.error = null;
         
-        const response = await fetch('http://localhost:3004/auth/login', {
+        const response = await fetch(`${import.meta.env.VITE_USER_API_URL}auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
