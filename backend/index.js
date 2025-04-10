@@ -12,6 +12,7 @@ const { startUserService } = require('./routes/userRoutes');
 const { startEnemyService } = require('./routes/enemyRoutes');
 const { startBossService } = require('./routes/bossRoutes');
 const { startShopService } = require('./routes/shopRoutes');
+const { startItemService } = require('./routes/itemRoutes');
 
 require('dotenv').config({ path: './environment/.env' });
 
@@ -20,7 +21,7 @@ require('dotenv').config({ path: './environment/.env' });
     await ensureDatabaseExists(); // 👈 esto crea la DB si no existe
     await sequelize.authenticate();
     console.log('Conexión a la base de datos establecida correctamente.');
-    // await seedItems(); // 👈 esto inserta los items en la DB
+    //await seedItems(); // 👈 esto inserta los items en la DB
     await sequelize.sync({ force: false }); // 👈 esto sincroniza los modelos con la DB
 
     // Iniciar microservicios
@@ -31,6 +32,7 @@ require('dotenv').config({ path: './environment/.env' });
     startEnemyService();
     startBossService();
     startShopService();
+    startItemService();
 
     console.log('Todos los servicios iniciados correctamente');
   } catch (error) {

@@ -7,10 +7,6 @@ const Boss = sequelize.define('Boss', {
     primaryKey: true,
     autoIncrement: true
   },
-  id_game: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
   boss_name: {
     type: DataTypes.STRING(50),
     allowNull: false
@@ -43,16 +39,9 @@ const Boss = sequelize.define('Boss', {
     type: DataTypes.FLOAT,
     allowNull: false
   },
-  location: {
-    type: DataTypes.STRING(100)
-  },
   reward_item: {
     type: DataTypes.INTEGER
   },
-  is_defeated: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false
-  }
 },{
   tableName: 'boss',
   timestamps: false
