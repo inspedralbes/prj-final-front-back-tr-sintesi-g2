@@ -19,7 +19,7 @@
           <v-btn
             color="primary"
             icon
-            @click="editBoss(item.raw)"
+            @click="editBoss(item)"
           >
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
@@ -74,12 +74,12 @@ export default {
       bosses: [],
       loading: false,
       headers: [
-        { title: 'ID', key: 'id' },
-        { title: 'Name', key: 'name' },
-        { title: 'Health', key: 'health' },
-        { title: 'Damage', key: 'damage' },
-        { title: 'Speed', key: 'speed' },
-        { title: 'Special Attack', key: 'specialAttackDamage' },
+        { title: 'ID', key: 'id_boss' },
+        { title: 'Name', key: 'boss_name' },
+        { title: 'Health', key: 'boss_max_health' },
+        { title: 'Damage', key: 'attack1_damage' },
+        { title: 'Speed', key: 'move_speed' },
+        { title: 'Special Attack', key: 'attack2_damage' },
         { title: 'Actions', key: 'actions', sortable: false }
       ],
       dialogEdit: false,
@@ -96,7 +96,7 @@ export default {
     async loadBosses() {
       this.loading = true
       try {
-        const response = await fetch(`${import.meta.env.VITE_BOSS_API_URL}boss`)
+        const response = await fetch(`${import.meta.env.VITE_BOSS_API_URL}bosses`)
         if (!response.ok) throw new Error('Error loading bosses')
         this.bosses = await response.json()
       } catch (error) {
@@ -104,31 +104,39 @@ export default {
       }
       this.loading = false
     },
-    editBoss(boss) {
-      this.editedBoss = { ...boss }
-      this.dialogEdit = true
-    },
-    async saveBoss() {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_BOSS_API_URL}boss/${this.editedBoss.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            health: Number(this.editedBoss.health),
-            damage: Number(this.editedBoss.damage),
-            speed: Number(this.editedBoss.speed),
-            specialAttackDamage: Number(this.editedBoss.specialAttackDamage)
-          })
-        })
-        if (!response.ok) throw new Error('Error updating boss')
-        this.loadBosses()
-        this.closeEdit()
-      } catch (error) {
-        console.error('Error updating boss:', error)
-      }
-    },
+    editBoss(item) {
+  this.editedBoss = {
+    id: item.id_boss,
+    health: item.boss_max_health,
+    damage: item.attack1_damage,
+    speed: item.move_speed,
+    specialAttackDamage: item.attack2_damage
+  }
+  this.dialogEdit = true
+},
+
+async saveBoss() {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BOSS_API_URL}bosses/${this.editedBoss.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        boss_max_health: Number(this.editedBoss.health),
+        attack1_damage: Number(this.editedBoss.damage),
+        move_speed: Number(this.editedBoss.speed),
+        attack2_damage: Number(this.editedBoss.specialAttackDamage)
+      })
+    })
+    if (!response.ok) throw new Error('Error updating boss')
+    await this.loadBosses()
+    this.closeEdit()
+  } catch (error) {
+    console.error('Error updating boss:', error)
+  }
+},
+
     closeEdit() {
       this.dialogEdit = false
       this.editedBoss = {
