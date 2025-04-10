@@ -64,7 +64,7 @@ export default {
     async loadPlayers() {
       this.loading = true
       try {
-        const response = await fetch('http://localhost:3001/player')
+        const response = await fetch(`${import.meta.env.VITE_PLAYER_API_URL}player`)
         if (!response.ok) throw new Error('Error loading players')
         this.players = await response.json()
       } catch (error) {
@@ -78,7 +78,7 @@ export default {
     },
     async deletePlayerConfirm() {
       try {
-        const response = await fetch(`http://localhost:3001/player/${this.playerIdToDelete}`, {
+        const response = await fetch(`${import.meta.env.VITE_PLAYER_API_URL}player/${this.playerIdToDelete}`, {
           method: 'DELETE'
         })
         if (!response.ok) throw new Error('Error deleting player')

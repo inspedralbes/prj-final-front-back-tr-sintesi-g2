@@ -74,7 +74,7 @@ export default {
     async loadItems() {
       this.loading = true
       try {
-        const response = await axios.get('http://localhost:3000/item')
+        const response = await axios.get(`${import.meta.env.VITE_INVENTORY_API_URL}item`)
         this.items = response.data
       } catch (error) {
         console.error('Error loading items:', error)

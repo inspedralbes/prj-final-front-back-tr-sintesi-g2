@@ -89,7 +89,7 @@ export default {
     async loadEnemies() {
       this.loading = true
       try {
-        const response = await fetch('http://localhost:3007/enemy')
+        const response = await fetch(`${import.meta.env.VITE_ENEMY_API_URL}enemy`)
         if (!response.ok) throw new Error('Error loading enemies')
         this.enemies = await response.json()
       } catch (error) {
@@ -103,7 +103,7 @@ export default {
     },
     async saveEnemy() {
       try {
-        const response = await fetch(`http://localhost:3007/enemy/${this.editedEnemy.id}`, {
+        const response = await fetch(`${import.meta.env.VITE_ENEMY_API_URL}enemy/${this.editedEnemy.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'

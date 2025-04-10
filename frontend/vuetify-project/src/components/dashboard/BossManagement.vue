@@ -96,7 +96,7 @@ export default {
     async loadBosses() {
       this.loading = true
       try {
-        const response = await fetch('http://localhost:3008/boss')
+        const response = await fetch(`${import.meta.env.VITE_BOSS_API_URL}boss`)
         if (!response.ok) throw new Error('Error loading bosses')
         this.bosses = await response.json()
       } catch (error) {
@@ -110,7 +110,7 @@ export default {
     },
     async saveBoss() {
       try {
-        const response = await fetch(`http://localhost:3008/boss/${this.editedBoss.id}`, {
+        const response = await fetch(`${import.meta.env.VITE_BOSS_API_URL}boss/${this.editedBoss.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'

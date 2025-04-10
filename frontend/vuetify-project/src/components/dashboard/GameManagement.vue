@@ -47,7 +47,7 @@ export default {
     async loadGames() {
       this.loading = true
       try {
-        const response = await fetch('http://localhost:3002/game')
+        const response = await fetch(`${import.meta.env.VITE_GAME_API_URL}game`)
         if (!response.ok) throw new Error('Error loading games')
         this.games = await response.json()
       } catch (error) {

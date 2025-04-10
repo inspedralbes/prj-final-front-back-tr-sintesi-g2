@@ -191,7 +191,7 @@ export default {
   methods: {
     async loadSkins() {
       try {
-        const response = await fetch('http://localhost:3009/shop')
+        const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop`)
         if (!response.ok) throw new Error('Error loading skins')
         this.skins = await response.json()
       } catch (error) {
@@ -239,13 +239,13 @@ export default {
         let response
         if (this.editedIndex > -1) {
           // Update
-          response = await fetch(`http://localhost:3009/shop/${this.editedItem.id}`, {
+          response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/${this.editedItem.id}`, {
             method: 'PUT',
             body: formData
           })
         } else {
           // Create
-          response = await fetch('http://localhost:3009/shop', {
+          response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop`, {
             method: 'POST',
             body: formData
           })
@@ -274,7 +274,7 @@ export default {
     },
     async deleteItemConfirm() {
       try {
-        const response = await fetch(`http://localhost:3009/shop/${this.editedItem.id}`, {
+        const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/${this.editedItem.id}`, {
           method: 'DELETE'
         })
         if (!response.ok) throw new Error('Error deleting skin')
