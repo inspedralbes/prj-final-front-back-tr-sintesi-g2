@@ -6,7 +6,7 @@ const seedShop = async () => {
       skin_name: 'Guerrero de Fuego',
       description: 'Un skin ardiente con armadura incandescente.',
       price: 500,
-      image_url: '/skins/guerrero-fuego.png',
+      image_url: 'shop\heroe.jpg',
       is_available: true
     },
     {

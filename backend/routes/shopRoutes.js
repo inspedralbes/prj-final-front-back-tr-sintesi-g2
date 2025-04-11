@@ -7,12 +7,13 @@ const path = require('path');
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/uploads/skins')
+    cb(null, path.join(__dirname, '../imagenes/shop')); // <-- Ajustado aquí
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname))
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
+
 
 const upload = multer({ 
   storage: storage,
@@ -32,7 +33,8 @@ const startShopService = () => {
   const app = express();
   app.use(express.json());
   app.use(cors());
-  app.use('/uploads', express.static('public/uploads'));
+  app.use('/imagenes', express.static(path.join(__dirname, '../imagenes')));
+
 
   // Get all skins
   app.get('/shop', async (req, res) => {
@@ -62,7 +64,7 @@ const startShopService = () => {
   app.post('/shop', upload.single('image'), async (req, res) => {
     try {
       const { skin_name, description, price, rarity } = req.body;
-      const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+      const image_url = req.file ? `/imagenes/shop/${req.file.filename}` : null;
 
       if (!skin_name || !price || !image_url) {
         return res.status(400).json({ message: 'Missing required fields' });
