@@ -21,7 +21,6 @@ require('dotenv').config({ path: './environment/.env' });
     await ensureDatabaseExists(); // 👈 esto crea la DB si no existe
     await sequelize.authenticate();
     console.log('Conexión a la base de datos establecida correctamente.');
-    await seedItems(); // 👈 esto inserta los items en la DB
     await sequelize.sync({ force: false }); // 👈 esto sincroniza los modelos con la DB
 
     // Iniciar microservicios
@@ -33,7 +32,7 @@ require('dotenv').config({ path: './environment/.env' });
     startBossService();
     startShopService();
     startItemService();
-
+    await seedItems(); // 👈 esto inserta los items en la DB
     console.log('Todos los servicios iniciados correctamente');
   } catch (error) {
     console.error('Error:', error);

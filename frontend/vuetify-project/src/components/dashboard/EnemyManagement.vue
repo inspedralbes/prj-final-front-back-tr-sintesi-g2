@@ -443,7 +443,6 @@ export default {
 <style scoped>
 .medieval-theme {
   background-color: #1a1a1a;
-  background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
   min-height: 100vh;
   padding: 20px;
 }
