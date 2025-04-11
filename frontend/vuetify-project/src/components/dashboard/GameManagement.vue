@@ -130,7 +130,7 @@ export default {
       },
       headers: [
         { text: 'ID', value: 'id', align: 'center', width: '70px' },
-        { text: 'PLAYER', value: 'playerId', align: 'start' },
+        { text: 'PLAYER', value: 'playerNickname', align: 'start' },
         { text: 'SCORE', value: 'score', align: 'center' },
         { text: 'TIME', value: 'time', align: 'center' },
         { text: 'STATUS', value: 'status', align: 'center' },

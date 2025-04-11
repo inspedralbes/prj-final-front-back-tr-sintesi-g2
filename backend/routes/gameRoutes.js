@@ -83,6 +83,39 @@ router.post('/newGame', async (req, res) => {
     res.status(500).send('Error al crear la partida.');
   }
 });
+router.get('/game', async (req, res) => {
+  try {
+    const games = await Game.findAll({
+      include: [
+        {
+          model: Player,
+          attributes: ['id_player', 'nickname']
+        },
+        {
+          model: Inventory,
+          attributes: ['id_inventory']
+        }
+      ],
+      order: [['last_save_date', 'DESC']]
+    });
+
+    const mappedGames = games.map(game => ({
+      id: game.id_game,
+      playerId: game.id_player,
+      playerNickname: game.Player.nickname,
+      score: parseFloat(game.total_progress),
+      time: game.time_played,
+      status: game.game_status,
+      createdAt: game.last_save_date
+    }));
+
+    res.status(200).json(mappedGames);
+  } catch (error) {
+    console.error('Error al obtener todos los juegos:', error);
+    res.status(500).send('Error al obtener los juegos.');
+  }
+});
+
 
 router.get('/loadGame/:nickname', async (req, res) => {
   const { nickname } = req.params;
