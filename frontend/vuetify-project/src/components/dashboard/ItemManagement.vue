@@ -45,50 +45,52 @@
           >
             <v-card class="item-card">
               <div class="item-rarity-indicator" :class="getRarityClass(item)"></div>
-              <v-img
-                :src="item.imageUrl"
-                height="180"
-                cover
-                class="item-image"
-              >
-                <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
-                  >
-                    <v-progress-circular
-                      indeterminate
-                      color="#DAA520"
-                    ></v-progress-circular>
-                  </v-row>
-                </template>
-                <div class="item-type-badge" :class="getTypeClass(item.type)">
-                  {{ item.type }}
-                </div>
-              </v-img>
+              <div class="item-image-container">
+                <v-img
+                  :src="item.imageUrl"
+                  height="180"
+                  contain
+                  class="item-image"
+                >
+                  <template v-slot:placeholder>
+                    <v-row
+                      class="fill-height ma-0"
+                      align="center"
+                      justify="center"
+                    >
+                      <v-progress-circular
+                        indeterminate
+                        color="#DAA520"
+                      ></v-progress-circular>
+                    </v-row>
+                  </template>
+                  <div class="item-type-badge" :class="getTypeClass(item.item_type)">
+                    {{ item.item_type }}
+                  </div>
+                </v-img>
+              </div>
               
-              <v-card-title class="item-title">{{ item.name }}</v-card-title>
+              <v-card-title class="item-title">{{ item.item_name }}</v-card-title>
               
               <v-divider class="item-divider"></v-divider>
               
               <v-card-text class="item-stats">
-                <div class="stat-row" v-if="item.effect">
-                  <v-icon small color="#DAA520" class="mr-2">mdi-magic-staff</v-icon>
-                  <span class="stat-label">Effect:</span>
-                  <span class="stat-value">{{ item.effect }}</span>
+                <div class="stat-row" v-if="item.item_description">
+                  <v-icon small color="#DAA520" class="mr-2">mdi-information-outline</v-icon>
+                  <span class="stat-label">Description:</span>
+                  <span class="stat-value">{{ item.item_description }}</span>
                 </div>
                 
-                <div class="stat-row" v-if="item.damage">
-                  <v-icon small color="#8B0000" class="mr-2">mdi-sword</v-icon>
-                  <span class="stat-label">Damage:</span>
-                  <span class="stat-value damage-text">{{ item.damage }}</span>
+                <div class="stat-row" v-if="item.value">
+                  <v-icon small color="#DAA520" class="mr-2">mdi-currency-usd</v-icon>
+                  <span class="stat-label">Value:</span>
+                  <span class="stat-value">{{ item.value }}</span>
                 </div>
                 
-                <div class="stat-row" v-if="item.defense">
-                  <v-icon small color="#1E90FF" class="mr-2">mdi-shield</v-icon>
-                  <span class="stat-label">Defense:</span>
-                  <span class="stat-value defense-text">{{ item.defense }}</span>
+                <div class="stat-row" v-if="item.rarity">
+                  <v-icon small color="#DAA520" class="mr-2">mdi-diamond-stone</v-icon>
+                  <span class="stat-label">Rarity:</span>
+                  <span class="stat-value">{{ item.rarity }}</span>
                 </div>
               </v-card-text>
             </v-card>
@@ -106,7 +108,7 @@
         <v-spacer></v-spacer>
         <div class="stat-chip">
           <v-icon left color="#DAA520">mdi-star</v-icon>
-          Legendary Items: {{ legendaryItemsCount }}
+          Rare Items: {{ rareItemsCount }}
         </div>
       </v-card-actions>
     </v-card>
@@ -145,9 +147,9 @@ export default {
     }
   },
   computed: {
-    legendaryItemsCount() {
+    rareItemsCount() {
       return this.items.filter(item => 
-        this.isLegendaryItem(item)
+        item.rarity === 'rare' || item.rarity === 'epic' || item.rarity === 'legendary'
       ).length;
     }
   },
@@ -155,8 +157,20 @@ export default {
     async loadItems() {
       this.loading = true;
       try {
-        const response = await axios.get(`${import.meta.env.VITE_ITEM_API_URL}items`);
-        this.items = response.data;
+        const response = await fetch(`${import.meta.env.VITE_ITEM_API_URL}items`);
+        const data = await response.json();
+
+        this.items = data.map(item => {
+          // Extraer solo el nombre del archivo de item_image
+          const fileName = item.item_image.split('/').pop();
+          
+          // Construir la URL correcta con el subdirectorio "items"
+          return {
+            ...item,
+            imageUrl: `${import.meta.env.VITE_ITEM_API_URL}imagenes/items/${fileName}`
+          };
+        });
+
         this.showNotification('Items summoned successfully', 'success', 'mdi-check-circle');
       } catch (error) {
         console.error('Error loading items:', error);
@@ -172,36 +186,32 @@ export default {
         case 'armor':
           return 'type-armor';
         case 'potion':
+        case 'pocion':
           return 'type-potion';
         case 'scroll':
           return 'type-scroll';
         case 'accessory':
           return 'type-accessory';
+        case 'llave':
+          return 'type-key';
         default:
           return 'type-misc';
       }
     },
     
     getRarityClass(item) {
-      if (this.isLegendaryItem(item)) {
-        return 'rarity-legendary';
-      } else if (item.damage >= 80 || item.defense >= 80) {
-        return 'rarity-epic';
-      } else if (item.damage >= 50 || item.defense >= 50) {
-        return 'rarity-rare';
-      } else if (item.damage >= 30 || item.defense >= 30) {
-        return 'rarity-uncommon';
-      } else {
-        return 'rarity-common';
+      switch(item.rarity?.toLowerCase()) {
+        case 'legendary':
+          return 'rarity-legendary';
+        case 'epic':
+          return 'rarity-epic';
+        case 'rare':
+          return 'rarity-rare';
+        case 'uncommon':
+          return 'rarity-uncommon';
+        default:
+          return 'rarity-common';
       }
-    },
-    
-    isLegendaryItem(item) {
-      return (
-        (item.damage && item.damage >= 100) || 
-        (item.defense && item.defense >= 100) ||
-        (item.effect && item.effect.toLowerCase().includes('legendary'))
-      );
     },
     
     showNotification(text, color, icon) {
@@ -309,6 +319,9 @@ export default {
   position: relative;
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .item-card:hover {
@@ -353,8 +366,19 @@ export default {
   100% { background-position: 0% 50%; }
 }
 
-.item-image {
+.item-image-container {
   position: relative;
+  background-color: #262220;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 180px;
+}
+
+.item-image {
+  object-fit: contain !important;
+  max-height: 160px !important;
+  margin: auto;
 }
 
 .item-type-badge {
@@ -369,6 +393,7 @@ export default {
   color: #e6ccb3;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(112, 66, 20, 0.8);
+  z-index: 1;
 }
 
 .type-weapon {
@@ -389,6 +414,10 @@ export default {
 
 .type-accessory {
   background-color: rgba(147, 112, 219, 0.8); /* Medium purple */
+}
+
+.type-key {
+  background-color: rgba(218, 165, 32, 0.8); /* Goldenrod */
 }
 
 .type-misc {
@@ -412,18 +441,21 @@ export default {
   padding: 12px 16px !important;
   color: #e6ccb3 !important;
   font-family: 'Philosopher', sans-serif !important;
+  flex-grow: 1;
 }
 
 .stat-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 
 .stat-label {
   font-weight: bold;
   margin-right: 6px;
   color: #a67c52;
+  min-width: 80px;
 }
 
 .stat-value {
@@ -442,6 +474,7 @@ export default {
   background-color: #353029;
   padding: 12px 16px !important;
   border-top: 2px solid #704214;
+  margin-top: auto;
 }
 
 .stat-chip {

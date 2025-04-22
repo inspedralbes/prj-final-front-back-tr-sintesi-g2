@@ -1,12 +1,18 @@
 const express = require('express');
 const Item = require('../models/Item');
 const cors = require('cors');
-
+const path = require('path');
 
 const startItemService = () => {
   const app = express();
   app.use(express.json());
   app.use(cors());
+  app.use('/imagenes', express.static(path.join(__dirname, '../imagenes'), {
+    setHeaders: (res, path) => {
+      res.set('Access-Control-Allow-Origin', '*');
+    }
+  }));
+  
 
   // Obtener todos los ítems
   app.get('/items', async (req, res) => {

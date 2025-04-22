@@ -216,8 +216,10 @@ export default {
     async fetchPlayers() {
       this.loading = true;
       try {
-        const response = await axios.get('http://localhost:3001/players');
-        this.players = response.data;
+        const response = await fetch(`${import.meta.env.VITE_PLAYER_API_URL}players`);
+        const data = await response.json();
+        this.players = data;
+
         this.showNotification('Players summoned successfully', 'success', 'mdi-check-circle');
       } catch (error) {
         this.showNotification('Failed to summon players', 'error', 'mdi-alert');
@@ -230,7 +232,10 @@ export default {
     async deletePlayer(playerId) {
       this.isDeleting = playerId;
       try {
-        await axios.delete(`http://localhost:3001/player/${playerId}`);
+        await fetch(`${import.meta.env.VITE_PLAYER_API_URL}${playerId}`, {
+        method: 'DELETE'
+      });
+
         this.players = this.players.filter(p => p.id_player !== playerId);
         this.showNotification('Player banished from the realm', 'success', 'mdi-check-circle');
       } catch (error) {
