@@ -2,6 +2,8 @@ const express = require('express');
 const Shop = require('../models/Shop');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
+const archiver = require('archiver');
 
 const startShopService = () => {
   const app = express();
@@ -78,6 +80,37 @@ const startShopService = () => {
       res.status(500).json({ error: error.message });
     }
   });
+
+  // Endpoint para descargar un zip de una skin
+  app.get('/shop/zip/:skinName', (req, res) => {
+    const rawName = req.params.skinName;
+    const capitalizedName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+    const folderPath = path.join(__dirname, '../imagenes/shop', capitalizedName);
+  
+    // Verifica que la carpeta existe
+    if (!fs.existsSync(folderPath)) {
+      return res.status(404).json({ message: `Carpeta para skin "${capitalizedName}" no encontrada.` });
+    }
+  
+    // Configura el nombre del zip y encabezados de descarga
+    const zipName = `${capitalizedName}.zip`;
+    res.setHeader('Content-Disposition', `attachment; filename=${zipName}`);
+    res.setHeader('Content-Type', 'application/zip');
+  
+    // Crea y envía el zip directamente al cliente
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
+  
+    archive.on('error', (err) => {
+      res.status(500).send({ error: err.message });
+    });
+  
+    archive.pipe(res);
+    archive.directory(folderPath, capitalizedName);
+    archive.finalize();
+  });
+  
 
   const port = process.env.SHOP_PORT || 3009;
   app.listen(port, () => {
