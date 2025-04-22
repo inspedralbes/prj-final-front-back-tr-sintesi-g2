@@ -67,6 +67,10 @@
                   {{ skin.price }} coins
                 </div>
               </v-img>
+
+              <div class="image-path mt-2" style="font-size: 0.8rem; color: #555; text-align: center;">
+                {{ skin.imageUrl }}
+              </div>
               
               <v-card-title class="item-title">{{ skin.name }}</v-card-title>
               
@@ -290,7 +294,13 @@ export default {
       try {
         const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop`)
         if (!response.ok) throw new Error('Error loading skins')
-        this.skins = await response.json()
+        const rawSkins = await response.json()
+        this.skins = rawSkins.map(skin => ({
+          ...skin,
+          imageUrl: `${import.meta.env.VITE_SHOP_API_URL}${skin.image_url}`
+        }))
+
+
         this.showNotification('Skins summoned successfully', 'success', 'mdi-check-circle');
       } catch (error) {
         console.error('Error loading skins:', error)
