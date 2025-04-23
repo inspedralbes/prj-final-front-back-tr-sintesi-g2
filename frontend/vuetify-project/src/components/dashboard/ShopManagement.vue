@@ -297,7 +297,7 @@ export default {
         const rawSkins = await response.json()
         this.skins = rawSkins.map(skin => ({
           ...skin,
-          imageUrl: `${import.meta.env.VITE_SHOP_API_URL}${skin.image_url}`
+          imageUrl: `${import.meta.env.VITE_SHOP_API_URL}imagenes/shop/Portadas/${skin.skin_name.toLowerCase()}.jpg`
         }))
 
 
@@ -349,7 +349,7 @@ export default {
         let response
         if (this.editedIndex > -1) {
           // Update
-          response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/${this.editedItem.id}`, {
+          response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/Portadas/${this.editedItem.id}`, {
             method: 'PUT',
             body: formData
           })
@@ -357,7 +357,7 @@ export default {
           this.showNotification('Skin modified successfully', 'success', 'mdi-check-circle');
         } else {
           // Create
-          response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop`, {
+          response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/Portadas/`, {
             method: 'POST',
             body: formData
           })
@@ -388,7 +388,7 @@ export default {
     },
     async deleteItemConfirm() {
       try {
-        const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/${this.editedItem.id}`, {
+        const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/Portadas/${this.editedItem.id}`, {
           method: 'DELETE'
         })
         if (!response.ok) throw new Error('Error deleting skin')

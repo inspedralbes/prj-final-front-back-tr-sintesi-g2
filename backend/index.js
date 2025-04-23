@@ -10,7 +10,6 @@ const seedBosses = require('./inserts/seedBosses');
 const seedInventory = require('./inserts/seedInventory');
 const seedShop = require('./inserts/seedShop');
 
-
 // Servicios
 const { startPlayerService } = require('./routes/playerRoutes');
 const { startGameService } = require('./routes/gameRoutes');
