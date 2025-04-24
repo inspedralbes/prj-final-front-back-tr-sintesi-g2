@@ -161,19 +161,89 @@
             ></v-textarea>
 
             <v-file-input
-              v-model="imageFile"
+              v-model="animationFiles.Attack"
               accept="image/*"
-              label="Skin Image"
+              label="Attack Image"
               :rules="imageRules"
-              @change="handleImageChange"
               class="medieval-input"
               filled
               dark
+              prepend-icon="mdi-sword"
             ></v-file-input>
-
+            <v-file-input
+              v-model="animationFiles.Dash"
+              accept="image/*"
+              label="Dash Image"
+              :rules="imageRules"
+              class="medieval-input"
+              filled
+              dark
+              prepend-icon="mdi-run-fast"
+            ></v-file-input>
+            <v-file-input
+              v-model="animationFiles.Death"
+              accept="image/*"
+              label="Death Image"
+              :rules="imageRules"
+              class="medieval-input"
+              filled
+              dark
+              prepend-icon="mdi-skull"
+            ></v-file-input>
+            <v-file-input
+              v-model="animationFiles.Fall"
+              accept="image/*"
+              label="Fall Image"
+              :rules="imageRules"
+              class="medieval-input"
+              filled
+              dark
+              prepend-icon="mdi-arrow-down"
+            ></v-file-input>
+            <v-file-input
+              v-model="animationFiles.Idle"
+              accept="image/*"
+              label="Idle Image"
+              :rules="imageRules"
+              class="medieval-input"
+              filled
+              dark
+              prepend-icon="mdi-sleep"
+            ></v-file-input>
+            <v-file-input
+              v-model="animationFiles.Run"
+              accept="image/*"
+              label="Run Image"
+              :rules="imageRules"
+              class="medieval-input"
+              filled
+              dark
+              prepend-icon="mdi-shoe-print"
+            ></v-file-input>
+            <v-file-input
+              v-model="animationFiles.TakeHit"
+              accept="image/*"
+              label="Take Hit Image"
+              :rules="imageRules"
+              class="medieval-input"
+              filled
+              dark
+              prepend-icon="mdi-emoticon-sad"
+            ></v-file-input>
+            <v-file-input
+              v-model="coverFile"
+              accept="image/*"
+              label="Cover Image (Portada)"
+              :rules="imageRules"
+              class="medieval-input"
+              filled
+              dark
+              prepend-icon="mdi-image"
+              @change="handleCoverChange"
+            ></v-file-input>
             <v-img
-              v-if="previewImage"
-              :src="previewImage"
+              v-if="previewCover"
+              :src="previewCover"
               max-height="200"
               contain
               class="preview-image mt-4"
@@ -253,8 +323,17 @@ export default {
       valid: false,
       loading: false,
       editedIndex: -1,
-      imageFile: null,
-      previewImage: null,
+      animationFiles: {
+        Attack: null,
+        Dash: null,
+        Death: null,
+        Fall: null,
+        Idle: null,
+        Run: null,
+        TakeHit: null
+      },
+      coverFile: null,
+      previewCover: null,
       snackbar: {
         show: false,
         text: '',
@@ -311,62 +390,72 @@ export default {
     editSkin(item) {
       this.editedIndex = this.skins.indexOf(item)
       this.editedItem = Object.assign({}, item)
-      this.previewImage = item.imageUrl
+      this.previewCover = item.imageUrl
       this.dialog = true
     },
     openCreateDialog() {
       this.editedItem = Object.assign({}, this.defaultItem)
       this.editedIndex = -1
-      this.previewImage = null
-      this.imageFile = null
+      this.previewCover = null
+      this.coverFile = null
       this.dialog = true
     },
-    async handleImageChange(file) {
+    handleCoverChange(file) {
       if (!file) {
-        this.previewImage = null
+        this.previewCover = null
         return
       }
-
-      // Create preview
       const reader = new FileReader()
       reader.onload = e => {
-        this.previewImage = e.target.result
+        this.previewCover = e.target.result
       }
       reader.readAsDataURL(file)
     },
     async save() {
       if (!this.$refs.form.validate()) return
-
-      const formData = new FormData()
-      formData.append('name', this.editedItem.name)
-      formData.append('price', this.editedItem.price)
-      formData.append('description', this.editedItem.description)
-      if (this.imageFile) {
-        formData.append('image', this.imageFile)
-      }
-
-      try {
-        let response
-        if (this.editedIndex > -1) {
-          // Update
-          response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/Portadas/${this.editedItem.id}`, {
-            method: 'PUT',
-            body: formData
-          })
-          if (!response.ok) throw new Error('Error updating skin')
-          this.showNotification('Skin modified successfully', 'success', 'mdi-check-circle');
-        } else {
-          // Create
-          response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/Portadas/`, {
-            method: 'POST',
-            body: formData
-          })
-          if (!response.ok) throw new Error('Error creating skin')
-          this.showNotification('New skin crafted successfully', 'success', 'mdi-check-circle');
+      // Validar que todas las imágenes estén presentes
+      const requiredKeys = ['Attack','Dash','Death','Fall','Idle','Run','TakeHit'];
+      for (const key of requiredKeys) {
+        if (!this.animationFiles[key]) {
+          this.showNotification(`Missing image: ${key}`, 'error', 'mdi-alert');
+          return;
         }
-        
-        this.close()
-        this.loadSkins()
+      }
+      if (!this.coverFile) {
+        this.showNotification('Missing cover image', 'error', 'mdi-alert');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('targetFolder', this.editedItem.name);
+      // Ordenar las imágenes según los sufijos del backend
+      requiredKeys.forEach(key => {
+        formData.append('images', this.animationFiles[key]);
+      });
+      formData.append('images', this.coverFile); // La portada debe ir la última
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/upload-images`, {
+          method: 'POST',
+          body: formData
+        });
+        if (!response.ok) throw new Error('Error uploading images');
+        this.showNotification('Skin images uploaded successfully', 'success', 'mdi-check-circle');
+        // Ahora crear la skin en la base de datos
+        const skinData = {
+          skin_name: this.editedItem.name,
+          price: this.editedItem.price,
+          description: this.editedItem.description,
+          image_url: `/imagenes/shop/Portadas/${this.editedItem.name}.png`,
+          is_available: true
+        };
+        const dbResponse = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(skinData)
+        });
+        if (!dbResponse.ok) throw new Error('Error creating skin in DB');
+        this.showNotification('New skin crafted successfully', 'success', 'mdi-check-circle');
+        this.close();
+        this.loadSkins();
       } catch (error) {
         console.error('Error saving skin:', error)
         this.showNotification('Failed to save skin', 'error', 'mdi-alert');
@@ -377,6 +466,8 @@ export default {
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
+        this.coverFile = null
+        this.previewCover = null
         this.imageFile = null
         this.previewImage = null
       })
@@ -438,6 +529,7 @@ export default {
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Philosopher:wght@400;700&display=swap');
+
 
 .medieval-theme {
   background-color: #1a1a1a;
