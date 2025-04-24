@@ -479,7 +479,7 @@ export default {
     },
     async deleteItemConfirm() {
       try {
-        const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/Portadas/${this.editedItem.id}`, {
+        const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/${this.editedItem.id_skin}`, {
           method: 'DELETE'
         })
         if (!response.ok) throw new Error('Error deleting skin')

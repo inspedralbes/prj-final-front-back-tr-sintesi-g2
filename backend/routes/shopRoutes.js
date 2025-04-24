@@ -8,6 +8,11 @@ const archiver = require('archiver');
 const sharp = require('sharp');
 
 const startShopService = () => {
+  // Asegura que la carpeta tmp existe antes de usarla con Multer
+  const tmpDir = path.join(__dirname, '../imagenes/shop/tmp');
+  if (!fs.existsSync(tmpDir)) {
+    fs.mkdirSync(tmpDir, { recursive: true });
+  }
   // Multer config para subida de imágenes temporales
   const upload = multer({ dest: path.join(__dirname, '../imagenes/shop/tmp'), limits: { files: 8 } });
   const app = express();
@@ -104,17 +109,40 @@ const startShopService = () => {
     }
   });
 
-  // Eliminar una skin
+  // Eliminar una skin y sus imágenes asociadas
   app.delete('/shop/:id', async (req, res) => {
+    console.log('DELETE /shop/:id called with id:', req.params.id);
     try {
       const skin = await Shop.findByPk(req.params.id);
-      if (skin) {
-        await skin.destroy();
-        res.json({ message: 'Skin eliminada' });
-      } else {
-        res.status(404).json({ message: 'Skin no encontrada' });
+      if (!skin) {
+        console.log('Skin no encontrada para id:', req.params.id);
+        return res.status(404).json({ message: 'Skin no encontrada' });
       }
+      // Guardar nombre de la skin antes de borrar
+      const skinName = skin.skin_name;
+      console.log('Skin encontrada:', skinName);
+      // Eliminar de la BBDD
+      await skin.destroy();
+      console.log('Entrada eliminada de la BBDD');
+      // Eliminar carpeta de imágenes de la skin
+      const folderPath = path.join(__dirname, '../imagenes/shop', skinName);
+      if (fs.existsSync(folderPath)) {
+        fs.rmSync(folderPath, { recursive: true, force: true });
+        console.log('Carpeta de imágenes eliminada:', folderPath);
+      } else {
+        console.log('No existe carpeta de imágenes para:', folderPath);
+      }
+      // Eliminar portada
+      const portadaPath = path.join(__dirname, '../imagenes/shop/Portadas', `${skinName}.jpg`);
+      if (fs.existsSync(portadaPath)) {
+        fs.unlinkSync(portadaPath);
+        console.log('Portada eliminada:', portadaPath);
+      } else {
+        console.log('No existe portada para:', portadaPath);
+      }
+      res.json({ message: 'Skin eliminada junto a sus imágenes.' });
     } catch (error) {
+      console.error('Error al eliminar skin:', error);
       res.status(500).json({ error: error.message });
     }
   });
