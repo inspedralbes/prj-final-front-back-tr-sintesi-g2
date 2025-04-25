@@ -164,16 +164,10 @@ export default {
           throw new Error(data.message || 'Error al registrarse');
         }
 
-        // Guardar el token en localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        // Mostrar mensaje de éxito
-        this.showNotification('¡Has sido registrado en el reino!', 'success', 'mdi-check-circle');
+        this.showNotification('¡Registro realizado correctamente!', 'success', 'mdi-check-circle');
 
-        // Redirigir al usuario después de un breve retraso
         setTimeout(() => {
-          this.$router.push('/');
+          this.$router.push('/login'); // o '/login'
         }, 1000);
       } catch (error) {
         this.error = error.message || 'Error al registrarse';

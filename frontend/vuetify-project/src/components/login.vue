@@ -116,44 +116,51 @@ export default {
   },
   methods: {
     async handleLogin() {
-      try {
-        this.loading = true;
-        this.error = null;
-        
-        const response = await fetch(`${import.meta.env.VITE_USER_API_URL}auth/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: this.email,
-            password: this.password
-          })
-        });
+  try {
+    this.loading = true;
+    this.error = null;
 
-        const data = await response.json();
+    const response = await fetch(`${import.meta.env.VITE_USER_API_URL}auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: this.email,
+        password: this.password
+      })
+    });
 
-        if (!response.ok) {
-          throw new Error(data.message || 'Error al iniciar sesión');
-        }
+    const data = await response.json();
 
-        // Guardar el token en localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al iniciar sesión');
+    }
 
-        // Mostrar mensaje de éxito
-        this.showNotification('Has ingresado al reino con éxito', 'success', 'mdi-check-circle');
+    // Guardar el token y el usuario en localStorage
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
 
-        // Redirigir al usuario al dashboard
-        setTimeout(() => {
-          this.$router.push('/dashboard');
-        }, 1000);
-      } catch (error) {
-        this.error = error.message || 'Error al iniciar sesión';
-      } finally {
-        this.loading = false;
-      }
-    },
+    // Verificar el rol y redirigir según el rol
+    if (data.user.role === 'admin') {
+      this.showNotification('Has ingresado al reino con éxito', 'success', 'mdi-check-circle');
+      setTimeout(() => {
+        this.$router.push('/dashboard'); // Redirige al dashboard si es admin
+      }, 1000);
+    } else if (data.user.role === 'user') {
+      this.showNotification('Bienvenido al juego', 'success', 'mdi-check-circle');
+      setTimeout(() => {
+        this.$router.push('/gameview'); // Redirige al gameview si es un user
+      }, 1000);
+    }
+
+  } catch (error) {
+    this.error = error.message || 'Error al iniciar sesión';
+  } finally {
+    this.loading = false;
+  }
+},
+
     
     showNotification(text, color, icon) {
       this.snackbar = {

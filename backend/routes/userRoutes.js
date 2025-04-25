@@ -69,7 +69,7 @@ const startUserService = () => {
         username,
         email,
         password: hashedPassword,
-        role: 'admin',
+        role: 'user',
         status: 'active'
       });
 
