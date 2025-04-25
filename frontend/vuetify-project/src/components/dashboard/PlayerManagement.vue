@@ -232,10 +232,9 @@ export default {
     async deletePlayer(playerId) {
       this.isDeleting = playerId;
       try {
-        await fetch(`${import.meta.env.VITE_PLAYER_API_URL}${playerId}`, {
+        await fetch(`${import.meta.env.VITE_PLAYER_API_URL}player/${playerId}`, {
         method: 'DELETE'
       });
-
         this.players = this.players.filter(p => p.id_player !== playerId);
         this.showNotification('Player banished from the realm', 'success', 'mdi-check-circle');
       } catch (error) {

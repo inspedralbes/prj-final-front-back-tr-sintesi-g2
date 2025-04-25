@@ -1,7 +1,7 @@
 const Game = require('../models/Game');
 
 const seedGames = async () => {
-  const games = [
+  const game = [
     {
       id_player: 1,
       id_inventory: 1,
@@ -43,7 +43,7 @@ const seedGames = async () => {
     }
   ];
 
-  await Game.bulkCreate(games, { ignoreDuplicates: true });
+  await Game.bulkCreate(game, { ignoreDuplicates: true });
   console.log('Juegos insertados correctamente');
 };
 

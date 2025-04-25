@@ -12,7 +12,7 @@ router.post('/createInventory', async (req, res) => {
     return res.status(400).json({ message: 'player_id requerido' });
   }
 
-  const initialItems = [1, 2, 3, 4, 5, 6, 7, 8];
+  const initialItems = [2,3];
 
   try {
     const createdItems = await Promise.all(
