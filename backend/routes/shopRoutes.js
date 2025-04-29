@@ -14,7 +14,7 @@ const startShopService = () => {
     fs.mkdirSync(tmpDir, { recursive: true });
   }
   // Multer config para subida de imágenes temporales
-  const upload = multer({ dest: path.join(__dirname, '../imagenes/shop/tmp'), limits: { files: 8 } });
+  const upload = multer({ dest: path.join(__dirname, '../imagenes/shop/tmp'), limits: { files: 9 } });
   const app = express();
   app.use(express.json());
   app.use(cors());
@@ -27,20 +27,20 @@ const startShopService = () => {
   }));
 
   // Subida múltiple de imágenes para la tienda (7 skins + 1 portada)
-  app.post('/shop/upload-images', upload.array('images', 8), async (req, res) => {
+  app.post('/shop/upload-images', upload.array('images', 9), async (req, res) => {
     try {
       const { targetFolder } = req.body;
       if (!targetFolder) {
         return res.status(400).json({ error: 'Falta el parámetro targetFolder' });
       }
-      if (!req.files || req.files.length !== 8) {
-        return res.status(400).json({ error: 'Debes subir exactamente 8 imágenes (7 skins + 1 portada)' });
+      if (!req.files || req.files.length !== 9) {
+        return res.status(400).json({ error: 'Debes subir exactamente 9 imágenes (8 skins + 1 portada)' });
       }
       // Guardar las 7 imágenes de la skin
       const folderPath = path.join(__dirname, '../imagenes/shop', targetFolder);
       if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
-      const suffixes = ['Attack', 'Dash', 'Death', 'Fall', 'Idle', 'Run', 'TakeHit'];
-      req.files.slice(0, 7).forEach((file, idx) => {
+      const suffixes = ['Attack', 'Dash', 'Death', 'Fall', 'Idle', 'Run', 'Jump', 'TakeHit'];
+      req.files.slice(0, 8).forEach((file, idx) => {
         const newName = `${targetFolder}${suffixes[idx]}.png`;
         const destPath = path.join(folderPath, newName);
         fs.renameSync(file.path, destPath);
@@ -48,7 +48,7 @@ const startShopService = () => {
       // Guardar la portada como JPG
       const portadaDir = path.join(__dirname, '../imagenes/shop/Portadas');
       if (!fs.existsSync(portadaDir)) fs.mkdirSync(portadaDir, { recursive: true });
-      const portadaFile = req.files[7];
+      const portadaFile = req.files[8];
       const portadaDestJpg = path.join(portadaDir, `${targetFolder}.jpg`);
       await sharp(portadaFile.path)
         .jpeg({ quality: 90 })

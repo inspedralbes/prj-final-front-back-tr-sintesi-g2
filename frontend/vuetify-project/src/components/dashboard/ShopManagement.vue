@@ -221,6 +221,16 @@
               prepend-icon="mdi-shoe-print"
             ></v-file-input>
             <v-file-input
+              v-model="animationFiles.Jump"
+              accept="image/*"
+              label="Jump Image"
+              :rules="imageRules"
+              class="medieval-input"
+              filled
+              dark
+              prepend-icon="mdi-arrow-up-bold"
+            ></v-file-input>
+            <v-file-input
               v-model="animationFiles.TakeHit"
               accept="image/*"
               label="Take Hit Image"
@@ -330,6 +340,7 @@ export default {
         Fall: null,
         Idle: null,
         Run: null,
+        Jump: null,
         TakeHit: null
       },
       coverFile: null,
@@ -414,7 +425,7 @@ export default {
     async save() {
       if (!this.$refs.form.validate()) return
       // Validar que todas las imágenes estén presentes
-      const requiredKeys = ['Attack','Dash','Death','Fall','Idle','Run','TakeHit'];
+      const requiredKeys = ['Attack','Dash','Death','Fall','Idle','Run','Jump','TakeHit'];
       for (const key of requiredKeys) {
         if (!this.animationFiles[key]) {
           this.showNotification(`Missing image: ${key}`, 'error', 'mdi-alert');
