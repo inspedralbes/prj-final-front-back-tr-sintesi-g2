@@ -99,12 +99,143 @@ const startShopService = () => {
     try {
       const skin = await Shop.findByPk(req.params.id);
       if (skin) {
+        // Chequear si el nombre cambia
+        const oldSkinName = skin.skin_name;
+        const newSkinName = req.body.skin_name;
+        if (oldSkinName && newSkinName && oldSkinName !== newSkinName) {
+          // Renombrar imágenes de la skin
+          const suffixes = ['Attack', 'Dash', 'Death', 'Fall', 'Idle', 'Run', 'Jump', 'TakeHit'];
+          const oldFolderPath = path.join(__dirname, '../imagenes/shop', oldSkinName);
+          const newFolderPath = path.join(__dirname, '../imagenes/shop', newSkinName);
+          if (!fs.existsSync(newFolderPath)) fs.mkdirSync(newFolderPath, { recursive: true });
+          suffixes.forEach(suffix => {
+            const oldFilePath = path.join(oldFolderPath, `${oldSkinName}${suffix}.png`);
+            const newFilePath = path.join(newFolderPath, `${newSkinName}${suffix}.png`);
+            if (fs.existsSync(oldFilePath)) {
+              fs.copyFileSync(oldFilePath, newFilePath);
+            }
+          });
+          // Eliminar carpeta vieja si existe
+          if (fs.existsSync(oldFolderPath)) {
+            fs.rmSync(oldFolderPath, { recursive: true, force: true });
+          }
+          // Renombrar portada
+          const oldPortadaPath = path.join(__dirname, '../imagenes/shop/Portadas', `${oldSkinName}.jpg`);
+          const newPortadaPath = path.join(__dirname, '../imagenes/shop/Portadas', `${newSkinName}.jpg`);
+          if (fs.existsSync(oldPortadaPath)) {
+            fs.copyFileSync(oldPortadaPath, newPortadaPath);
+            fs.unlinkSync(oldPortadaPath);
+          }
+        }
         await skin.update(req.body);
         res.json(skin);
       } else {
         res.status(404).json({ message: 'Skin no encontrada' });
       }
     } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Actualizar imágenes de una skin existente
+  app.post('/shop/update-images/:id', upload.array('images', 9), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { targetFolder, oldSkinName } = req.body;
+
+      if (!targetFolder) {
+        return res.status(400).json({ error: 'Falta el parámetro targetFolder' });
+      }
+
+      // Verificar que la skin existe
+      const skin = await Shop.findByPk(id);
+      if (!skin) {
+        return res.status(404).json({ error: 'Skin no encontrada' });
+      }
+
+      // Crear nueva carpeta si no existe
+      const folderPath = path.join(__dirname, '../imagenes/shop', targetFolder);
+      if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
+
+      // Procesar las imágenes que se han subido
+      const suffixes = ['Attack', 'Dash', 'Death', 'Fall', 'Idle', 'Run', 'Jump', 'TakeHit'];
+      const uploadedFiles = {};
+
+      // Registrar qué archivos se han subido
+      req.files.forEach((file, idx) => {
+        if (idx < 8) {
+          uploadedFiles[suffixes[idx]] = file;
+        } else if (idx === 8) {
+          uploadedFiles['Portada'] = file;
+        }
+      });
+
+      // Si el nombre de la skin ha cambiado, necesitamos mover/renombrar archivos
+      if (oldSkinName && oldSkinName !== targetFolder) {
+        const oldFolderPath = path.join(__dirname, '../imagenes/shop', oldSkinName);
+        const oldPortadaPath = path.join(__dirname, '../imagenes/shop/Portadas', `${oldSkinName}.jpg`);
+
+        // Si la carpeta vieja existe, copiar los archivos que no se han actualizado
+        if (fs.existsSync(oldFolderPath)) {
+          suffixes.forEach(suffix => {
+            const oldFilePath = path.join(oldFolderPath, `${oldSkinName}${suffix}.png`);
+            const newFilePath = path.join(folderPath, `${targetFolder}${suffix}.png`);
+
+            // Si este archivo no se ha actualizado, copiarlo de la carpeta vieja
+            if (!uploadedFiles[suffix] && fs.existsSync(oldFilePath)) {
+              fs.copyFileSync(oldFilePath, newFilePath);
+            }
+          });
+
+          // Si ya no hay referencias a la carpeta vieja, eliminarla
+          if (oldSkinName !== targetFolder) {
+            fs.rmSync(oldFolderPath, { recursive: true, force: true });
+          }
+        }
+
+        // Manejar la portada si existe y no se ha actualizado
+        if (!uploadedFiles['Portada'] && fs.existsSync(oldPortadaPath)) {
+          const newPortadaPath = path.join(__dirname, '../imagenes/shop/Portadas', `${targetFolder}.jpg`);
+          fs.copyFileSync(oldPortadaPath, newPortadaPath);
+
+          // Eliminar la portada vieja si el nombre ha cambiado
+          if (oldSkinName !== targetFolder) {
+            fs.unlinkSync(oldPortadaPath);
+          }
+        }
+      }
+
+      // Procesar los archivos que se han subido
+      for (const suffix of suffixes) {
+        if (uploadedFiles[suffix]) {
+          const file = uploadedFiles[suffix];
+          const newName = `${targetFolder}${suffix}.png`;
+          const destPath = path.join(folderPath, newName);
+          fs.renameSync(file.path, destPath);
+        }
+      }
+
+      // Procesar la portada si se ha subido
+      if (uploadedFiles['Portada']) {
+        const portadaDir = path.join(__dirname, '../imagenes/shop/Portadas');
+        if (!fs.existsSync(portadaDir)) fs.mkdirSync(portadaDir, { recursive: true });
+
+        const portadaFile = uploadedFiles['Portada'];
+        const portadaDestJpg = path.join(portadaDir, `${targetFolder}.jpg`);
+
+        await sharp(portadaFile.path)
+          .jpeg({ quality: 90 })
+          .toFile(portadaDestJpg);
+
+        fs.unlinkSync(portadaFile.path);
+      }
+
+      res.json({
+        message: 'Imágenes de skin actualizadas correctamente.',
+        newImageUrl: `/imagenes/shop/Portadas/${targetFolder}.jpg`
+      });
+    } catch (error) {
+      console.error('Error actualizando imágenes:', error);
       res.status(500).json({ error: error.message });
     }
   });

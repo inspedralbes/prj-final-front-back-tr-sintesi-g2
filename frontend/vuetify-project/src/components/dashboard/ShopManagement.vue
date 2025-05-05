@@ -87,7 +87,7 @@
                   @click="editSkin(skin)"
                 >
                   <v-icon left>mdi-pencil</v-icon>
-                  <span class="btn-text-small">MODIFY</span>
+                  <span class="btn-text-small">EDIT</span>
                 </v-btn>
                 <v-btn
                   color="error"
@@ -119,11 +119,14 @@
     </v-card>
 
     <!-- Create/Edit Dialog -->
-    <v-dialog v-model="dialog" max-width="500px">
+    <v-dialog v-model="dialog" max-width="600px">
       <v-card class="parchment-card dialog-card">
         <v-card-title class="dialog-title">
           {{ formTitle }}
         </v-card-title>
+        <v-card-subtitle v-if="isEditing" class="dialog-subtitle">
+          Las imágenes que no cambies se conservarán automáticamente
+        </v-card-subtitle>
 
         <v-divider class="divider"></v-divider>
 
@@ -163,8 +166,8 @@
             <v-file-input
               v-model="animationFiles.Attack"
               accept="image/*"
-              label="Attack Image"
-              :rules="imageRules"
+              :label="isEditing ? `Attack Image (${oldSkinName ? 'Se conservará la imagen anterior si no se cambia' : ''})` : 'Attack Image'"
+              :rules="isEditing ? [] : imageRules.concat([v => !!v || 'Attack image is required'])"
               class="medieval-input"
               filled
               dark
@@ -173,8 +176,8 @@
             <v-file-input
               v-model="animationFiles.Dash"
               accept="image/*"
-              label="Dash Image"
-              :rules="imageRules"
+              :label="isEditing ? `Dash Image (${oldSkinName ? 'Se conservará la imagen anterior si no se cambia' : ''})` : 'Dash Image'"
+              :rules="isEditing ? [] : imageRules.concat([v => !!v || 'Dash image is required'])"
               class="medieval-input"
               filled
               dark
@@ -183,8 +186,8 @@
             <v-file-input
               v-model="animationFiles.Death"
               accept="image/*"
-              label="Death Image"
-              :rules="imageRules"
+              :label="isEditing ? `Death Image (${oldSkinName ? 'Se conservará la imagen anterior si no se cambia' : ''})` : 'Death Image'"
+              :rules="isEditing ? [] : imageRules.concat([v => !!v || 'Death image is required'])"
               class="medieval-input"
               filled
               dark
@@ -193,8 +196,8 @@
             <v-file-input
               v-model="animationFiles.Fall"
               accept="image/*"
-              label="Fall Image"
-              :rules="imageRules"
+              :label="isEditing ? `Fall Image (${oldSkinName ? 'Se conservará la imagen anterior si no se cambia' : ''})` : 'Fall Image'"
+              :rules="isEditing ? [] : imageRules.concat([v => !!v || 'Fall image is required'])"
               class="medieval-input"
               filled
               dark
@@ -203,8 +206,8 @@
             <v-file-input
               v-model="animationFiles.Idle"
               accept="image/*"
-              label="Idle Image"
-              :rules="imageRules"
+              :label="isEditing ? `Idle Image (${oldSkinName ? 'Se conservará la imagen anterior si no se cambia' : ''})` : 'Idle Image'"
+              :rules="isEditing ? [] : imageRules.concat([v => !!v || 'Idle image is required'])"
               class="medieval-input"
               filled
               dark
@@ -213,8 +216,8 @@
             <v-file-input
               v-model="animationFiles.Run"
               accept="image/*"
-              label="Run Image"
-              :rules="imageRules"
+              :label="isEditing ? `Run Image (${oldSkinName ? 'Se conservará la imagen anterior si no se cambia' : ''})` : 'Run Image'"
+              :rules="isEditing ? [] : imageRules.concat([v => !!v || 'Run image is required'])"
               class="medieval-input"
               filled
               dark
@@ -223,8 +226,8 @@
             <v-file-input
               v-model="animationFiles.Jump"
               accept="image/*"
-              label="Jump Image"
-              :rules="imageRules"
+              :label="isEditing ? `Jump Image (${oldSkinName ? 'Se conservará la imagen anterior si no se cambia' : ''})` : 'Jump Image'"
+              :rules="isEditing ? [] : imageRules.concat([v => !!v || 'Jump image is required'])"
               class="medieval-input"
               filled
               dark
@@ -233,8 +236,8 @@
             <v-file-input
               v-model="animationFiles.TakeHit"
               accept="image/*"
-              label="Take Hit Image"
-              :rules="imageRules"
+              :label="isEditing ? `Take Hit Image (${oldSkinName ? 'Se conservará la imagen anterior si no se cambia' : ''})` : 'Take Hit Image'"
+              :rules="isEditing ? [] : imageRules.concat([v => !!v || 'Take Hit image is required'])"
               class="medieval-input"
               filled
               dark
@@ -243,8 +246,8 @@
             <v-file-input
               v-model="coverFile"
               accept="image/*"
-              label="Cover Image (Portada)"
-              :rules="imageRules"
+              :label="isEditing ? `Cover Image (Portada) (${oldSkinName ? 'Se conservará la imagen anterior si no se cambia' : ''})` : 'Cover Image (Portada)'"
+              :rules="isEditing ? [] : imageRules.concat([v => !!v || 'Cover image is required'])"
               class="medieval-input"
               filled
               dark
@@ -333,6 +336,8 @@ export default {
       valid: false,
       loading: false,
       editedIndex: -1,
+      isEditing: false,
+      oldSkinName: null,
       animationFiles: {
         Attack: null,
         Dash: null,
@@ -372,7 +377,7 @@ export default {
   },
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'Craft New Skin' : 'Modify Skin'
+      return this.editedIndex === -1 ? 'Craft New Skin' : 'Edit Skin'
     },
     totalValue() {
       return this.skins.reduce((sum, skin) => sum + Number(skin.price), 0)
@@ -400,9 +405,17 @@ export default {
     },
     editSkin(item) {
       this.editedIndex = this.skins.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.previewCover = item.imageUrl
+      this.editedItem = {
+        id: item.id_skin,
+        name: item.skin_name,
+        price: item.price,
+        description: item.description,
+        imageUrl: item.image_url
+      }
+      this.oldSkinName = item.skin_name
+      this.previewCover = item.image_url
       this.dialog = true
+      this.isEditing = true
     },
     openCreateDialog() {
       this.editedItem = Object.assign({}, this.defaultItem)
@@ -410,6 +423,8 @@ export default {
       this.previewCover = null
       this.coverFile = null
       this.dialog = true
+      this.isEditing = false
+      this.oldSkinName = null
     },
     handleCoverChange(file) {
       if (!file) {
@@ -424,53 +439,138 @@ export default {
     },
     async save() {
       if (!this.$refs.form.validate()) return
-      // Validar que todas las imágenes estén presentes
-      const requiredKeys = ['Attack','Dash','Death','Fall','Idle','Run','Jump','TakeHit'];
-      for (const key of requiredKeys) {
-        if (!this.animationFiles[key]) {
-          this.showNotification(`Missing image: ${key}`, 'error', 'mdi-alert');
-          return;
-        }
-      }
-      if (!this.coverFile) {
-        this.showNotification('Missing cover image', 'error', 'mdi-alert');
-        return;
-      }
-      const formData = new FormData();
-      formData.append('targetFolder', this.editedItem.name);
-      // Ordenar las imágenes según los sufijos del backend
-      requiredKeys.forEach(key => {
-        formData.append('images', this.animationFiles[key]);
-      });
-      formData.append('images', this.coverFile); // La portada debe ir la última
+      
       try {
-        const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/upload-images`, {
-          method: 'POST',
-          body: formData
-        });
-        if (!response.ok) throw new Error('Error uploading images');
-        this.showNotification('Skin images uploaded successfully', 'success', 'mdi-check-circle');
-        // Ahora crear la skin en la base de datos
-        const skinData = {
-          skin_name: this.editedItem.name,
-          price: this.editedItem.price,
-          description: this.editedItem.description,
-          image_url: `/imagenes/shop/Portadas/${this.editedItem.name}.png`,
-          is_available: true
-        };
-        const dbResponse = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(skinData)
-        });
-        if (!dbResponse.ok) throw new Error('Error creating skin in DB');
-        this.showNotification('New skin crafted successfully', 'success', 'mdi-check-circle');
+        // Verificar si estamos en modo edición o creación
+        if (this.isEditing) {
+          await this.updateSkin();
+        } else {
+          await this.createSkin();
+        }
+        
         this.close();
         this.loadSkins();
       } catch (error) {
         console.error('Error saving skin:', error)
         this.showNotification('Failed to save skin', 'error', 'mdi-alert');
       }
+    },
+    
+    async createSkin() {
+      // Validar que todas las imágenes estén presentes (solo para creación)
+      const requiredKeys = ['Attack','Dash','Death','Fall','Idle','Run','Jump','TakeHit'];
+      for (const key of requiredKeys) {
+        if (!this.animationFiles[key]) {
+          this.showNotification(`Missing image: ${key}`, 'error', 'mdi-alert');
+          throw new Error(`Missing image: ${key}`);
+        }
+      }
+      if (!this.coverFile) {
+        this.showNotification('Missing cover image', 'error', 'mdi-alert');
+        throw new Error('Missing cover image');
+      }
+      
+      const formData = new FormData();
+      formData.append('targetFolder', this.editedItem.name);
+      
+      // Ordenar las imágenes según los sufijos del backend
+      requiredKeys.forEach(key => {
+        formData.append('images', this.animationFiles[key]);
+      });
+      formData.append('images', this.coverFile); // La portada debe ir la última
+      
+      const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/upload-images`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) throw new Error('Error uploading images');
+      this.showNotification('Skin images uploaded successfully', 'success', 'mdi-check-circle');
+      
+      // Ahora crear la skin en la base de datos
+      const skinData = {
+        skin_name: this.editedItem.name,
+        price: this.editedItem.price,
+        description: this.editedItem.description,
+        image_url: `/imagenes/shop/Portadas/${this.editedItem.name}.jpg`,
+        is_available: true
+      };
+      
+      const dbResponse = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(skinData)
+      });
+      
+      if (!dbResponse.ok) throw new Error('Error creating skin in DB');
+      this.showNotification('New skin crafted successfully', 'success', 'mdi-check-circle');
+    },
+    
+    async updateSkin() {
+      // Verificar qué imágenes se han cambiado
+      const requiredKeys = ['Attack','Dash','Death','Fall','Idle','Run','Jump','TakeHit'];
+      const hasChangedImages = Object.values(this.animationFiles).some(file => file !== null) || this.coverFile !== null;
+      
+      // Si hay cambios en las imágenes, subir las nuevas
+      if (hasChangedImages) {
+        const formData = new FormData();
+        formData.append('targetFolder', this.editedItem.name);
+        formData.append('oldSkinName', this.oldSkinName);
+        
+        // Añadir las imágenes que se han cambiado
+        let filesCount = 0;
+        requiredKeys.forEach(key => {
+          if (this.animationFiles[key]) {
+            formData.append('images', this.animationFiles[key]);
+            filesCount++;
+          }
+        });
+        
+        // Añadir la portada si se ha cambiado
+        if (this.coverFile) {
+          formData.append('images', this.coverFile);
+          filesCount++;
+        }
+        
+        // Solo enviar la petición si hay archivos para actualizar
+        if (filesCount > 0) {
+          const response = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/update-images/${this.editedItem.id}`, {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (!response.ok) throw new Error('Error updating images');
+          
+          const data = await response.json();
+          if (data.newImageUrl) {
+            this.editedItem.imageUrl = data.newImageUrl;
+          }
+          
+          this.showNotification('Skin images updated successfully', 'success', 'mdi-check-circle');
+        }
+      }
+      
+      // Actualizar los datos en la base de datos
+      const skinData = {
+        skin_name: this.editedItem.name,
+        price: this.editedItem.price,
+        description: this.editedItem.description,
+        image_url: this.editedItem.imageUrl
+      };
+      
+      // Si el nombre ha cambiado, actualizar la URL de la imagen
+      if (this.oldSkinName !== this.editedItem.name) {
+        skinData.image_url = `/imagenes/shop/Portadas/${this.editedItem.name}.jpg`;
+      }
+      
+      const dbResponse = await fetch(`${import.meta.env.VITE_SHOP_API_URL}shop/${this.editedItem.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(skinData)
+      });
+      
+      if (!dbResponse.ok) throw new Error('Error updating skin in DB');
+      this.showNotification('Skin updated successfully', 'success', 'mdi-check-circle');
     },
     close() {
       this.dialog = false
@@ -481,6 +581,12 @@ export default {
         this.previewCover = null
         this.imageFile = null
         this.previewImage = null
+        this.isEditing = false
+        this.oldSkinName = null
+        // Limpiar los archivos de animación
+        Object.keys(this.animationFiles).forEach(key => {
+          this.animationFiles[key] = null;
+        });
       })
     },
     confirmDelete(item) {
