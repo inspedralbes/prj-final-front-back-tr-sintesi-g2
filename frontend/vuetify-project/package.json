@@ -14,6 +14,7 @@
     "axios": "^1.8.4",
     "nodemon": "^3.1.9",
     "roboto-fontface": "*",
+    "socket.io-client": "^4.8.1",
     "vue": "^3.4.31",
     "vuetify": "^3.6.14"
   },

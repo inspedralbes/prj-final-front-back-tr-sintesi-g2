@@ -1,8 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const { spawn, exec } = require('child_process');
+const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
+const { Server } = require('socket.io');
 
 // Configuración
 const PORT = process.env.PORT || 3000;
@@ -136,22 +138,33 @@ async function startService(serviceType) {
   child.on('close', (code) => {
     logMessage(serviceType, `Proceso terminado con código ${code}`);
     runningServices[serviceType] = null;
+    // Emitir cambio de estado al cerrarse el proceso
+    checkServiceStatus(serviceType).then(status => {
+      io.emit('service-status-changed', status);
+    });
   });
 
   logMessage(serviceType, `Servicio iniciado en puerto ${serviceConfig.port}`);
   await new Promise(resolve => setTimeout(resolve, 1000));
-  return await checkServiceStatus(serviceType);
+  const newStatus = await checkServiceStatus(serviceType);
+  io.emit('service-status-changed', newStatus); // Emitir cambio de estado
+  return newStatus;
 }
+
 // Detener servicio individual
 async function stopService(serviceType) {
   const process = runningServices[serviceType];
   if (!process) {
-    return await checkServiceStatus(serviceType);
+    const status = await checkServiceStatus(serviceType);
+    io.emit('service-status-changed', status);
+    return status;
   }
   return new Promise((resolve, reject) => {
     process.once('close', async () => {
       runningServices[serviceType] = null;
-      resolve(await checkServiceStatus(serviceType));
+      const status = await checkServiceStatus(serviceType);
+      io.emit('service-status-changed', status);
+      resolve(status);
     });
     try {
       process.kill('SIGTERM');
@@ -160,7 +173,6 @@ async function stopService(serviceType) {
     }
   });
 }
-
 
 // Iniciar todos los servicios
 async function startAllServices() {
@@ -211,6 +223,7 @@ app.post('/services/:serviceType/start', checkServiceExists, async (req, res) =>
     res.status(500).json({ success: false, message: error.message });
   }
 });
+
 app.post('/services/:serviceType/stop', checkServiceExists, async (req, res) => {
   try {
     const status = await stopService(req.params.serviceType);
@@ -224,14 +237,28 @@ app.post('/services/:serviceType/stop', checkServiceExists, async (req, res) => 
     res.status(500).json({ success: false, message: error.message });
   }
 });
-// Exportar
-app.listen(PORT, () => {
+
+// --- SOCKET.IO INTEGRACIÓN ---
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
+
+// Al conectar un cliente, enviar el estado de todos los servicios
+io.on('connection', async (socket) => {
+  const statuses = await Promise.all(
+    Object.keys(services).map(serviceType => checkServiceStatus(serviceType))
+  );
+  socket.emit('all-services-status', statuses);
+});
+
+// Iniciar el servidor
+server.listen(PORT, () => {
   console.log(`Controlador de servicios corriendo en puerto ${PORT}`);
 });
 
+// Exports
 module.exports = {
   app,
   startService,
-  stopService, // <-- Añade esto si lo usas fuera
+  stopService,
   startAllServices
 };

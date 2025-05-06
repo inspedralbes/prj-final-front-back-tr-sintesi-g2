@@ -221,6 +221,8 @@ import GameManagement from './dashboard/GameManagement.vue'
 import ItemManagement from './dashboard/ItemManagement.vue'
 import ShopManagement from './dashboard/ShopManagement.vue'
 import axios from 'axios'
+import { io } from "socket.io-client";
+
 
 export default {
   name: 'Dashboard',
@@ -328,14 +330,59 @@ export default {
           value: 'actions'
         }
       ],
-      serviceApiUrl: process.env.VUE_APP_SERVICE_CONTROL_API || 'http://localhost:3000'
+      serviceApiUrl: process.env.VUE_APP_SERVICE_CONTROL_API || 'http://localhost:3000',
+      socket: null
     }
   },
   mounted() {
     // Verificar el estado de los servicios al cargar el componente
     this.refreshServices();
+    this.socket = io(this.serviceApiUrl);
+
+    // Recibir el estado inicial de todos los servicios
+    this.socket.on("all-services-status", (services) => {
+      this.updateServicesFromSocket(services);
+    });
+
+    // Recibir cambios individuales de estado
+    this.socket.on("service-status-changed", (service) => {
+      this.updateServiceStatusFromSocket(service);
+    });
+
+    // También refresca el estado vía REST por si acaso
+    this.refreshServices();
   },
+  beforeDestroy() {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+  },
+  
   methods: {
+    // Actualiza toda la lista de servicios con el array recibido por socket
+    // Actualiza toda la lista de servicios con el array recibido por socket
+updateServicesFromSocket(servicesData) {
+  servicesData.forEach(serviceData => {
+    const index = this.services.findIndex(s => s.serviceType === serviceData.serviceType);
+    if (index !== -1) {
+      this.services[index] = { ...serviceData, loading: false };
+    }
+  });
+},
+
+// Actualiza solo un servicio individual recibido por socket
+updateServiceStatusFromSocket(serviceData) {
+  const index = this.services.findIndex(s => s.serviceType === serviceData.serviceType);
+  if (index !== -1) {
+    this.services[index] = { ...serviceData, loading: false };
+    this.showNotification(
+      `Servicio ${serviceData.name} ahora está ${serviceData.status}`,
+      serviceData.status === 'ONLINE' ? 'success' : 'error',
+      serviceData.status === 'ONLINE' ? 'mdi-power' : 'mdi-power-off'
+    );
+  }
+},
+
     handleLogout() {
       this.logoutDialog = true;
     },
@@ -408,39 +455,23 @@ export default {
     },
     
     async toggleService(service) {
-      // Marcar el servicio como cargando
-      service.loading = true;
-      
-      try {
-        const action = service.status === 'ONLINE' ? 'stop' : 'start';
-        
-        // Llamar al API de control de servicios
-        const response = await axios.post(`${this.serviceApiUrl}/services/${service.serviceType}/${action}`);
-        
-        if (response.data.success) {
-          // Actualizar el estado del servicio localmente
-          service.status = action === 'start' ? 'ONLINE' : 'OFFLINE';
-          
-          // Mostrar notificación
-          const actionText = action === 'start' ? 'iniciado' : 'detenido';
-          this.showNotification(`Servicio ${service.name} ${actionText} correctamente`, 'success', 
-            action === 'start' ? 'mdi-power' : 'mdi-power-off');
-        } else {
-          // Mostrar error
-          this.showNotification(`Error al ${action === 'start' ? 'iniciar' : 'detener'} el servicio: ${response.data.message}`, 
-            'error', 'mdi-alert-circle');
-        }
-      } catch (error) {
-        console.error('Error al controlar el servicio:', error);
-        
-        // Mostrar error
-        this.showNotification(`Error de conexión: No se pudo ${service.status === 'ONLINE' ? 'detener' : 'iniciar'} el servicio`, 
-          'error', 'mdi-alert-circle');
-      } finally {
-        // Desmarcar el servicio como cargando
-        service.loading = false;
-      }
-    }
+  service.loading = true;
+  try {
+    const action = service.status === 'ONLINE' ? 'stop' : 'start';
+    await axios.post(`${this.serviceApiUrl}/services/${service.serviceType}/${action}`);
+    // NO cambies el status aquí, ni pongas loading = false
+    // Espera al evento socket para actualizar el estado real y quitar loading
+  } catch (error) {
+    this.showNotification(
+      `Error de conexión: No se pudo ${service.status === 'ONLINE' ? 'detener' : 'iniciar'} el servicio`,
+      'error',
+      'mdi-alert-circle'
+    );
+    service.loading = false; // Solo aquí, en caso de error de red
+  }
+}
+
+    
   }
 }
 </script>
