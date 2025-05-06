@@ -11,6 +11,17 @@
             </div>
             <v-spacer></v-spacer>
             
+            <!-- Botón de mantenimiento -->
+            <v-btn
+              color="primary"
+              class="maintenance-btn mr-3"
+              @click="openMaintenanceDialog"
+              elevation="2"
+            >
+              <v-icon left>mdi-tools</v-icon>
+              <span class="btn-text">MANTENIMIENTO</span>
+            </v-btn>
+            
             <!-- Botón de logout -->
             <v-btn
               color="accent"
@@ -126,6 +137,79 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    
+    <!-- Diálogo de mantenimiento de servicios -->
+    <v-dialog v-model="maintenanceDialog" max-width="800" class="medieval-dialog">
+      <v-card class="parchment-card">
+        <v-card-title class="card-title">
+          <div class="title-wrapper">
+            <v-icon left>mdi-tools</v-icon>
+            <span class="dialog-title">MANTENIMIENTO DE SERVICIOS</span>
+          </div>
+          <v-spacer></v-spacer>
+        </v-card-title>
+        
+        <v-divider class="divider"></v-divider>
+        
+        <v-card-text class="dialog-content">
+          <v-data-table
+            :headers="serviceHeaders"
+            :items="services"
+            :items-per-page="5"
+            class="medieval-table"
+          >
+            <template v-slot:item.status="{ item }">
+              <v-chip
+                :color="getStatusColor(item.status)"
+                text-color="white"
+                small
+                class="status-chip"
+              >
+                {{ item.status }}
+              </v-chip>
+            </template>
+
+            <template v-slot:item.actions="{ item }">
+              <v-btn
+                small
+                :color="item.status === 'ONLINE' ? 'error' : 'success'"
+                @click="toggleService(item)"
+                class="mx-1 service-btn"
+                :loading="item.loading"
+                elevation="2"
+              >
+                <v-icon left small>
+                  {{ item.status === 'ONLINE' ? 'mdi-power-off' : 'mdi-power' }}
+                </v-icon>
+                {{ item.status === 'ONLINE' ? 'DETENER' : 'INICIAR' }}
+              </v-btn>
+            </template>
+          </v-data-table>
+        </v-card-text>
+        
+        <v-divider class="divider"></v-divider>
+        
+        <v-card-actions class="dialog-actions">
+          <v-spacer></v-spacer>
+          <v-btn 
+            color="primary" 
+            @click="refreshServices" 
+            :loading="loading"
+            class="refresh-btn"
+          >
+            <v-icon left>mdi-refresh</v-icon>
+            <span class="btn-text">ACTUALIZAR</span>
+          </v-btn>
+          <v-btn 
+            color="secondary" 
+            @click="maintenanceDialog = false" 
+            class="close-btn"
+          >
+            <span class="btn-text">CERRAR</span>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -136,6 +220,7 @@ import BossManagement from './dashboard/BossManagement.vue'
 import GameManagement from './dashboard/GameManagement.vue'
 import ItemManagement from './dashboard/ItemManagement.vue'
 import ShopManagement from './dashboard/ShopManagement.vue'
+import axios from 'axios'
 
 export default {
   name: 'Dashboard',
@@ -151,13 +236,104 @@ export default {
     return {
       activeTab: 'players',
       logoutDialog: false,
+      maintenanceDialog: false,
+      loading: false,
       snackbar: {
         show: false,
         text: '',
         color: '',
         icon: ''
-      }
+      },
+      services: [
+        {
+          id: 1,
+          name: 'Servicio de Jugadores',
+          status: 'OFFLINE',
+          port: '3001',
+          serviceType: 'player',
+          loading: false
+        },
+        {
+          id: 2,
+          name: 'Servicio de Partidas',
+          status: 'OFFLINE',
+          port: '3002',
+          serviceType: 'game',
+          loading: false
+        },
+        {
+          id: 3,
+          name: 'Servicio de Inventario',
+          status: 'OFFLINE',
+          port: '3003',
+          serviceType: 'inventory',
+          loading: false
+        },
+        {
+          id: 5,
+          name: 'Servicio de Objetos',
+          status: 'OFFLINE',
+          port: '3005',
+          serviceType: 'item',
+          loading: false
+        },
+        {
+          id: 6,
+          name: 'Servicio de Enemigos',
+          status: 'OFFLINE',
+          port: '3007',
+          serviceType: 'enemy',
+          loading: false
+        },
+        {
+          id: 7,
+          name: 'Servicio de Jefes',
+          status: 'OFFLINE',
+          port: '3008',
+          serviceType: 'boss',
+          loading: false
+        },
+        {
+          id: 8,
+          name: 'Servicio de Tienda',
+          status: 'OFFLINE',
+          port: '3009',
+          serviceType: 'shop',
+          loading: false
+        }
+      ],
+      serviceHeaders: [
+        {
+          text: 'NOMBRE',
+          align: 'start',
+          sortable: true,
+          value: 'name'
+        },
+        {
+          text: 'ESTADO',
+          align: 'center',
+          sortable: true,
+          value: 'status'
+        },
+        {
+          text: 'PUERTO',
+          align: 'center',
+          sortable: true,
+          value: 'port'
+        },
+        {
+          text: 'ACCIONES',
+          align: 'center',
+          sortable: false,
+          value: 'actions'
+        }
+      ],
+      serviceApiUrl: process.env.VUE_APP_SERVICE_CONTROL_API || 'http://localhost:3000'
     }
+  },
+  mounted() {
+    // Verificar el estado de los servicios al cargar el componente
+    this.refreshServices();
   },
   methods: {
     handleLogout() {
@@ -188,6 +364,82 @@ export default {
         color,
         icon
       };
+    },
+    
+    openMaintenanceDialog() {
+      this.maintenanceDialog = true;
+      this.refreshServices();
+    },
+    
+    getStatusColor(status) {
+      return status === 'ONLINE' ? 'success' : 'error';
+    },
+    
+    async refreshServices() {
+      this.loading = true;
+      
+      try {
+        // Obtener el estado de todos los servicios
+        const response = await axios.get(`${this.serviceApiUrl}/services`);
+        
+        if (response.data.success) {
+          // Actualizar la información de los servicios
+          const servicesData = response.data.services;
+          
+          servicesData.forEach(serviceData => {
+            const index = this.services.findIndex(s => s.serviceType === serviceData.serviceType);
+            if (index !== -1) {
+              // Mantener el estado de loading
+              const currentLoading = this.services[index].loading;
+              this.services[index] = { ...serviceData, loading: currentLoading };
+            }
+          });
+          
+          this.showNotification('Estado de servicios actualizado', 'info', 'mdi-refresh');
+        } else {
+          this.showNotification('Error al obtener el estado de los servicios', 'warning', 'mdi-alert');
+        }
+      } catch (error) {
+        console.error('Error al obtener el estado de los servicios:', error);
+        this.showNotification('Error de conexión con el servidor de control', 'error', 'mdi-alert-circle');
+      } finally {
+        this.loading = false;
+      }
+    },
+    
+    async toggleService(service) {
+      // Marcar el servicio como cargando
+      service.loading = true;
+      
+      try {
+        const action = service.status === 'ONLINE' ? 'stop' : 'start';
+        
+        // Llamar al API de control de servicios
+        const response = await axios.post(`${this.serviceApiUrl}/services/${service.serviceType}/${action}`);
+        
+        if (response.data.success) {
+          // Actualizar el estado del servicio localmente
+          service.status = action === 'start' ? 'ONLINE' : 'OFFLINE';
+          
+          // Mostrar notificación
+          const actionText = action === 'start' ? 'iniciado' : 'detenido';
+          this.showNotification(`Servicio ${service.name} ${actionText} correctamente`, 'success', 
+            action === 'start' ? 'mdi-power' : 'mdi-power-off');
+        } else {
+          // Mostrar error
+          this.showNotification(`Error al ${action === 'start' ? 'iniciar' : 'detener'} el servicio: ${response.data.message}`, 
+            'error', 'mdi-alert-circle');
+        }
+      } catch (error) {
+        console.error('Error al controlar el servicio:', error);
+        
+        // Mostrar error
+        this.showNotification(`Error de conexión: No se pudo ${service.status === 'ONLINE' ? 'detener' : 'iniciar'} el servicio`, 
+          'error', 'mdi-alert-circle');
+      } finally {
+        // Desmarcar el servicio como cargando
+        service.loading = false;
+      }
     }
   }
 }
@@ -245,6 +497,15 @@ export default {
 
 .logout-btn {
   background-color: #8B0000 !important;
+  border: 1px solid #704214 !important;
+  color: #e6ccb3 !important;
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.maintenance-btn {
+  background-color: #6b4226 !important;
   border: 1px solid #704214 !important;
   color: #e6ccb3 !important;
   font-family: 'Cinzel', serif !important;
@@ -320,7 +581,6 @@ export default {
   color: #e6ccb3;
   font-size: 1.1rem;
   padding: 20px;
-  text-align: center;
 }
 
 .dialog-actions {
@@ -338,6 +598,50 @@ export default {
   background-color: #8B0000 !important;
   border: 1px solid #704214 !important;
   color: #e6ccb3 !important;
+}
+
+.refresh-btn {
+  background-color: #4a6741 !important;
+  border: 1px solid #704214 !important;
+  color: #e6ccb3 !important;
+  margin-right: 10px;
+}
+
+.close-btn {
+  background-color: #444 !important;
+  border: 1px solid #704214 !important;
+  color: #e6ccb3 !important;
+}
+
+.medieval-table {
+  background-color: transparent !important;
+}
+
+.medieval-table :deep(th) {
+  font-family: 'Cinzel', serif !important;
+  color: #DAA520 !important;
+  letter-spacing: 1px;
+  font-weight: bold;
+  background-color: #451804 !important;
+}
+
+.medieval-table :deep(td) {
+  font-family: 'Philosopher', sans-serif !important;
+  color: #e6ccb3 !important;
+  border-bottom: 1px solid #704214 !important;
+}
+
+.service-btn {
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 1px;
+  text-transform: none;
+  font-weight: bold;
+  border: 1px solid #704214 !important;
+}
+
+.status-chip {
+  font-family: 'Philosopher', sans-serif !important;
+  font-weight: bold;
 }
 
 /* Para cargar las fuentes necesarias */

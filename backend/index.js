@@ -19,6 +19,7 @@ const { startEnemyService } = require('./routes/enemyRoutes');
 const { startBossService } = require('./routes/bossRoutes');
 const { startShopService } = require('./routes/shopRoutes');
 const { startItemService } = require('./routes/itemRoutes');
+require('./routes/serviceController');
 
 require('dotenv').config({ path: './environment/.env' });
 
@@ -28,16 +29,15 @@ require('dotenv').config({ path: './environment/.env' });
     await sequelize.authenticate();
     console.log('Conexión a la base de datos establecida correctamente.');
     await sequelize.sync({ force: false }); // 👈 esto sincroniza los modelos con la DB
-
     // Iniciar microservicios
-    startPlayerService();
-    startGameService();
-    startInventoryService();
+    //tartPlayerService();
+    //startGameService();
+    //startInventoryService();
     startUserService();
-    startEnemyService();
-    startBossService();
-    startShopService();
-    startItemService();
+    //startEnemyService();
+    //startBossService();
+    //startShopService();
+    //startItemService();
     // await seedItems(); // 👈 esto inserta los items en la DB
     // await seedGames(); // 👈 esto inserta los juegos en la DB
     // await seedPlayers(); // 👈 esto inserta los jugadores en la DB
