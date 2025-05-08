@@ -95,6 +95,9 @@
             <v-window-item value="shop">
               <ShopManagement />
             </v-window-item>
+            <v-window-item value="enemy-death-stats">
+              <EnemyDeathStats />
+            </v-window-item>
           </v-window>
         </v-card>
       </v-col>

@@ -116,12 +116,12 @@ export default {
       this.imageError = false;
       this.imageLoaded = false;
       
-      // Add a timestamp to force refresh and bypass cache
+      // Añadir timestamp para evitar caché
       const timestamp = new Date().getTime();
       
-      // Construir la URL de la imagen siguiendo la estructura de Express
-      this.imgUrl = `${import.meta.env.VITE_ENEMYSTATS_API_URL || 'http://localhost:3010'}/stat_images/deaths_per_enemy.png?t=${timestamp}`;
-      console.log('Refreshing image from URL:', this.imgUrl);
+      // Usar la URL de Vite directamente sin reemplazo de "/"
+      const baseUrl = import.meta.env.VITE_ENEMYSTATS_API_URL;
+      this.imgUrl = `${baseUrl}stat_images/deaths_per_enemy.png?t=${timestamp}`;
       
       this.showNotification('Summoning fresh statistics', 'info', 'mdi-refresh');
       
@@ -136,9 +136,10 @@ export default {
     loadImage() {
       this.loading = true;
       
-      // Construir la URL de la imagen usando la estructura correcta
-      // Basado en cómo está configurado tu Express router y static middleware
-      this.imgUrl = `${import.meta.env.VITE_ENEMYSTATS_API_URL || 'http://localhost:3010'}stat_images/deaths_per_enemy.png`;
+      // Usar la URL de Vite directamente sin reemplazo de "/"
+      const baseUrl = import.meta.env.VITE_ENEMYSTATS_API_URL;
+      this.imgUrl = `${baseUrl}stat_images/deaths_per_enemy.png`;
+      
       console.log('Loading image from URL:', this.imgUrl);
       
       // Set current date as last updated
@@ -163,8 +164,10 @@ export default {
     
     async fetchAdditionalStats() {
       try {
+        // Usar la URL de Vite directamente sin reemplazo de "/"
+        const baseUrl = import.meta.env.VITE_ENEMYSTATS_API_URL;
         // Intentar obtener datos adicionales si están disponibles
-        const response = await fetch(`${import.meta.env.VITE_ENEMYSTATS_API_URL || 'http://localhost:3010'}api/enemy-death-stats/data`);
+        const response = await fetch(`${baseUrl}enemy-death-stats/data`);
         if (response.ok) {
           const data = await response.json();
           if (data.mostDeadly) {
@@ -172,7 +175,7 @@ export default {
           }
         }
       } catch (error) {
-        console.log('No additional stats available, using default value');
+        console.log('No additional stats available, using default value:', error);
         // Usar valor por defecto si no hay API para datos adicionales
         this.getMostDeadlyEnemy();
       }

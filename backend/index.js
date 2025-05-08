@@ -37,7 +37,7 @@ require('dotenv').config({ path: './environment/.env' });
     //startGameService();
     //startInventoryService();
     startUserService();
-    startEnemyDeathStatService();
+    //startEnemyDeathStatService();
     //startEnemyService();
     //startBossService();
     //startShopService();
