@@ -52,6 +52,11 @@ const services = {
     port: process.env.SHOP_PORT || 3009,
     script: path.join(__dirname, 'services/shopService.js')
   },
+  'enemy-death-stats': {
+    name: 'Servicio de Estadísticas de Muertes de Enemigos',
+    port: process.env.ENEMY_DEATH_STAT_PORT || 3010,
+    script: path.join(__dirname, 'services/enemyDeathStatService.js')
+  },
 };
 
 // Estado de procesos

@@ -10,6 +10,7 @@ const Game = require('./Game');
 const Inventory = require('./Inventory');
 const Item = require('./Item');
 const Player = require('./Player');
+const EnemyDeathStat = require('./EnemyDeathStat');
 
 // Definir relaciones entre modelos
 // Player - User (un usuario puede tener varios jugadores)
@@ -40,6 +41,10 @@ Boss.belongsTo(Game, { foreignKey: 'game_id' });
 Game.hasMany(Enemy, { foreignKey: 'game_id', onDelete: 'CASCADE' });
 Enemy.belongsTo(Game, { foreignKey: 'game_id' });
 
+// Game - EnemyDeathStat (un juego puede tener muchos enemigos muertos)
+Game.hasMany(EnemyDeathStat, { foreignKey: 'game_id', onDelete: 'CASCADE' });
+EnemyDeathStat.belongsTo(Game, { foreignKey: 'game_id' });
+
 // Exportar modelos y sequelize
 module.exports = {
     sequelize,
@@ -50,5 +55,6 @@ module.exports = {
     Game,
     Inventory,
     Item,
-    Player
+    Player,
+    EnemyDeathStat
 };

@@ -67,6 +67,10 @@
               <v-icon left>mdi-store</v-icon>
               <span class="tab-text">TIENDA</span>
             </v-tab>
+            <v-tab value="enemy-death-stats" class="tab-item">
+              <v-icon left>mdi-skull-crossbones</v-icon>
+              <span class="tab-text">ESTADÍSTICAS</span>
+            </v-tab>
           </v-tabs>
         </v-card>
         
@@ -220,6 +224,7 @@ import BossManagement from './dashboard/BossManagement.vue'
 import GameManagement from './dashboard/GameManagement.vue'
 import ItemManagement from './dashboard/ItemManagement.vue'
 import ShopManagement from './dashboard/ShopManagement.vue'
+import EnemyDeathStats from './dashboard/EnemyDeathStats.vue'
 import axios from 'axios'
 import { io } from "socket.io-client";
 
@@ -232,7 +237,8 @@ export default {
     BossManagement,
     GameManagement,
     ItemManagement,
-    ShopManagement
+    ShopManagement,
+    EnemyDeathStats
   },
   data() {
     return {
@@ -301,6 +307,14 @@ export default {
           status: 'OFFLINE',
           port: '3009',
           serviceType: 'shop',
+          loading: false
+        },
+        {
+          id: 9,
+          name: 'Servicio de Estadísticas',
+          status: 'OFFLINE',
+          port: '3010',
+          serviceType: 'enemy-death-stats',
           loading: false
         }
       ],
