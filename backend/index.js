@@ -9,6 +9,7 @@ const seedEnemies = require('./inserts/seedEnemies');
 const seedBosses = require('./inserts/seedBosses');
 const seedInventory = require('./inserts/seedInventory');
 const seedShop = require('./inserts/seedShop');
+const seedEnemyDeathStats = require('./inserts/seedEnemyDeathStats');
 
 // Servicios
 const { startPlayerService } = require('./routes/playerRoutes');
@@ -19,6 +20,8 @@ const { startEnemyService } = require('./routes/enemyRoutes');
 const { startBossService } = require('./routes/bossRoutes');
 const { startShopService } = require('./routes/shopRoutes');
 const { startItemService } = require('./routes/itemRoutes');
+const { startEnemyDeathStatService } = require('./routes/enemyDeathStatRoutes');
+
 require('./routes/serviceController');
 
 require('dotenv').config({ path: './environment/.env' });
@@ -34,6 +37,7 @@ require('dotenv').config({ path: './environment/.env' });
     //startGameService();
     //startInventoryService();
     startUserService();
+    startEnemyDeathStatService();
     //startEnemyService();
     //startBossService();
     //startShopService();
@@ -45,7 +49,6 @@ require('dotenv').config({ path: './environment/.env' });
     //await seedBosses(); // 👈 esto inserta los jefes en la DB
     //await seedInventory(); // 👈 esto inserta los inventarios en la DB
     //await seedShop(); // 👈 esto inserta los tiendas en la DB
-    
     console.log('Todos los servicios iniciados correctamente');
   } catch (error) {
     console.error('Error:', error);

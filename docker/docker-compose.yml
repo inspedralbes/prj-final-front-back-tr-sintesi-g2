@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   adminer:
     image: adminer
@@ -39,15 +41,23 @@ services:
       - "3007:3007"
       - "3008:3008"
       - "3009:3009"
+      - "3010:3010"
     working_dir: /app/backend
     volumes:
       - ../backend:/app/backend
       - /app/backend/node_modules
     depends_on:
       - mysql
-    command: sh -c "sleep 5 && npm install && npm run dev"
+    command: >
+      sh -c "
+        apk add --no-cache python3 py3-pip py3-numpy py3-matplotlib py3-pandas py3-seaborn py3-setuptools py3-wheel py3-pymysql &&
+        sleep 5 &&
+        npm install &&
+        npm run dev
+      "
     networks:
       - trFinal_network
+
 
   frontend:
     image: node:18-alpine
@@ -61,7 +71,12 @@ services:
       - /app/frontend/node_modules
     depends_on:
       - backend
-    command: sh -c "sleep 6 && npm install && npm run dev"
+    command: >
+      sh -c "
+        sleep 6 &&
+        npm install &&
+        npm run dev
+      "
     networks:
       - trFinal_network
 
