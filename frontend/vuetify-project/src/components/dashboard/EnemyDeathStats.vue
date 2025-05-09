@@ -29,50 +29,53 @@
         
         <div v-else-if="chartList && !imageError" class="stats-img-container">
           <v-card flat class="image-frame">
-  <v-tabs v-model="selectedChart" background-color="transparent" grow class="stats-tabs">
-    <v-tab
-      v-for="(chart, idx) in chartList"
-      :key="chart.key + '-tab'"
-      :value="idx"
-      class="tab-label"
-    >
-      {{ chart.shortLabel }}
-    </v-tab>
-  </v-tabs>
-  <v-tabs-items v-model="selectedChart">
-    <v-tab-item
-      v-for="(chart, idx) in chartList"
-      :key="chart.key + '-tab-item'"
-      :value="idx"
-    >
-      <div class="tab-img-wrapper">
-        <div class="img-scroll-box">
-          <img
-            :src="chart.url"
-            :alt="chart.label"
-            class="stats-img-tab clickable"
-            @click="openModal(chart)"
-            @error="handleImageError"
-            @load="imageLoaded = true"
-          />
-        </div>
-        <div class="image-caption" v-if="imageLoaded">
-          <span class="caption-text">{{ chart.label }}</span>
-        </div>
-      </div>
-      <!-- Modal para imagen ampliada -->
-      <v-dialog v-model="showModal" max-width="98vw" max-height="98vh" persistent>
-        <v-card class="modal-img-card">
-          <v-btn icon class="modal-close-btn" @click="showModal = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <img :src="modalImgUrl" :alt="modalImgLabel" class="modal-img" />
-          <div class="modal-caption">{{ modalImgLabel }}</div>
-        </v-card>
-      </v-dialog>
-    </v-tab-item>
-  </v-tabs-items>
-</v-card>
+            <v-tabs v-model="selectedChart" background-color="transparent" grow class="stats-tabs">
+              <v-tab
+                v-for="(chart, idx) in chartList"
+                :key="chart.key + '-tab'"
+                :value="idx"
+                class="tab-label"
+                @click="selectChart(idx)"
+              >
+                {{ chart.shortLabel }}
+              </v-tab>
+            </v-tabs>
+            
+            <v-window v-model="selectedChart">
+              <v-window-item
+                v-for="(chart, idx) in chartList"
+                :key="chart.key + '-content'"
+                :value="idx"
+              >
+                <div class="tab-img-wrapper">
+                  <div class="img-scroll-box">
+                    <img
+                      :src="chart.url"
+                      :alt="chart.label"
+                      class="stats-img-tab clickable"
+                      @click="openModal(chart)"
+                      @error="handleImageError"
+                      @load="imageLoaded = true"
+                    />
+                  </div>
+                  <div class="image-caption" v-if="imageLoaded">
+                    <span class="caption-text">{{ chart.label }}</span>
+                  </div>
+                </div>
+              </v-window-item>
+            </v-window>
+          </v-card>
+          
+          <!-- Modal para imagen ampliada -->
+          <v-dialog v-model="showModal" max-width="98vw" max-height="98vh" persistent>
+            <v-card class="modal-img-card">
+              <v-btn icon class="modal-close-btn" @click="showModal = false">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+              <img :src="modalImgUrl" :alt="modalImgLabel" class="modal-img" />
+              <div class="modal-caption">{{ modalImgLabel }}</div>
+            </v-card>
+          </v-dialog>
         </div>
         
         <div v-else class="empty-stats">
@@ -80,7 +83,7 @@
           <div class="empty-text">No enemy death records have been inscribed in the realm...yet</div>
           <div class="debug-info">
             <p>Debug information:</p>
-            <p>Image URL: {{ imgUrl }}</p>
+            <p>Image URL: {{ chartList[selectedChart]?.url }}</p>
             <p>Try checking the console for more details.</p>
           </div>
         </div>
@@ -202,7 +205,8 @@ export default {
       this.selectedChart = idx;
       this.imageError = false;
       this.imageLoaded = false;
-      // Opcional: podrías forzar recarga de imagen aquí si quieres
+      // Cargar imagen correspondiente a la pestaña seleccionada
+      this.loadImage();
     },
     
     loadImage() {
@@ -353,16 +357,28 @@ export default {
 .image-frame {
   background-color: rgba(40, 30, 20, 0.6) !important;
   border: 4px solid #704214 !important;
-}
   border-radius: 8px !important;
   overflow: hidden;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7) !important;
+  width: 100%;
+}
+
+.tab-label {
+  color: #e6ccb3 !important;
+  font-family: 'Cinzel', serif !important;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
 
 .caption-text {
   font-size: 1rem;
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   letter-spacing: 1px;
+  color: #e6ccb3;
+  margin-top: 12px;
 }
 
 .tab-img-wrapper {
@@ -373,11 +389,13 @@ export default {
   justify-content: flex-start;
   min-height: 0;
   max-height: 72vh;
+  padding: 16px;
 }
+
 .img-scroll-box {
   width: 100%;
   max-width: 100%;
-  max-height: 70vh;
+  max-height: 65vh;
   min-height: 320px;
   display: flex;
   align-items: center;
@@ -385,11 +403,12 @@ export default {
   overflow: auto;
   background: #f9f3e6;
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
 }
+
 .stats-img-tab {
   max-width: 100%;
-  max-height: 68vh;
+  max-height: 65vh;
   width: auto;
   height: auto;
   display: block;
@@ -430,6 +449,70 @@ export default {
   font-family: 'Cinzel', serif;
   font-weight: bold;
   letter-spacing: 1px;
+}
+
+.empty-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: #e6ccb3;
+  text-align: center;
+}
+
+.empty-text {
+  margin-top: 16px;
+  font-family: 'Philosopher', sans-serif;
+  font-size: 1.2rem;
+  color: #e6ccb3;
+}
+
+.debug-info {
+  margin-top: 20px;
+  font-size: 0.8rem;
+  color: #a89b8c;
+  max-width: 400px;
+}
+
+.modal-img-card {
+  background-color: #2c2421 !important;
+  border: 3px solid #704214 !important;
+  border-radius: 8px !important;
+  position: relative;
+  padding: 16px;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #e6ccb3 !important;
+  background-color: rgba(70, 40, 20, 0.8) !important;
+  z-index: 10;
+}
+
+.modal-img {
+  max-width: 95vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+}
+
+.modal-caption {
+  margin-top: 16px;
+  color: #e6ccb3;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-weight: bold;
+}
+
+.stats-tabs {
+  background-color: #451804 !important;
+  border-bottom: 2px solid #704214;
 }
 
 /* Import required fonts */
