@@ -8,9 +8,39 @@ const router = express.Router();
 
 
 
-// Endpoint para servir la imagen de estadísticas generada
+// Endpoint para servir la imagen de muertes por enemigo
 router.get('/enemy-death-stats/image', (req, res) => {
   const imgPath = path.resolve(__dirname, '../stat_images/deaths_per_enemy.png');
+  res.sendFile(imgPath, err => {
+    if (err) {
+      res.status(404).json({ error: 'Imagen no encontrada' });
+    }
+  });
+});
+
+// Endpoint para servir la imagen de muertes por día
+router.get('/enemy-death-stats/image/day', (req, res) => {
+  const imgPath = path.resolve(__dirname, '../stat_images/deaths_per_day.png');
+  res.sendFile(imgPath, err => {
+    if (err) {
+      res.status(404).json({ error: 'Imagen no encontrada' });
+    }
+  });
+});
+
+// Endpoint para servir la imagen de muertes por usuario/jugador
+router.get('/enemy-death-stats/image/user', (req, res) => {
+  const imgPath = path.resolve(__dirname, '../stat_images/deaths_per_user.png');
+  res.sendFile(imgPath, err => {
+    if (err) {
+      res.status(404).json({ error: 'Imagen no encontrada' });
+    }
+  });
+});
+
+// Endpoint para servir la imagen de muertes por boss
+router.get('/enemy-death-stats/image/boss', (req, res) => {
+  const imgPath = path.resolve(__dirname, '../stat_images/deaths_per_boss.png');
   res.sendFile(imgPath, err => {
     if (err) {
       res.status(404).json({ error: 'Imagen no encontrada' });

@@ -27,19 +27,52 @@
           <div class="loading-text">Summoning death statistics from the battlefield...</div>
         </div>
         
-        <div v-else-if="imgUrl && !imageError" class="stats-img-container">
+        <div v-else-if="chartList && !imageError" class="stats-img-container">
           <v-card flat class="image-frame">
-            <img 
-              :src="imgUrl" 
-              alt="Enemy Death Statistics" 
-              class="stats-img" 
-              @error="handleImageError"
-              @load="imageLoaded = true"
-            />
-            <div class="image-caption" v-if="imageLoaded">
-              <span class="caption-text">Death statistics of your most fearsome foes</span>
-            </div>
-          </v-card>
+  <v-tabs v-model="selectedChart" background-color="transparent" grow class="stats-tabs">
+    <v-tab
+      v-for="(chart, idx) in chartList"
+      :key="chart.key + '-tab'"
+      :value="idx"
+      class="tab-label"
+    >
+      {{ chart.shortLabel }}
+    </v-tab>
+  </v-tabs>
+  <v-tabs-items v-model="selectedChart">
+    <v-tab-item
+      v-for="(chart, idx) in chartList"
+      :key="chart.key + '-tab-item'"
+      :value="idx"
+    >
+      <div class="tab-img-wrapper">
+        <div class="img-scroll-box">
+          <img
+            :src="chart.url"
+            :alt="chart.label"
+            class="stats-img-tab clickable"
+            @click="openModal(chart)"
+            @error="handleImageError"
+            @load="imageLoaded = true"
+          />
+        </div>
+        <div class="image-caption" v-if="imageLoaded">
+          <span class="caption-text">{{ chart.label }}</span>
+        </div>
+      </div>
+      <!-- Modal para imagen ampliada -->
+      <v-dialog v-model="showModal" max-width="98vw" max-height="98vh" persistent>
+        <v-card class="modal-img-card">
+          <v-btn icon class="modal-close-btn" @click="showModal = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <img :src="modalImgUrl" :alt="modalImgLabel" class="modal-img" />
+          <div class="modal-caption">{{ modalImgLabel }}</div>
+        </v-card>
+      </v-dialog>
+    </v-tab-item>
+  </v-tabs-items>
+</v-card>
         </div>
         
         <div v-else class="empty-stats">
@@ -88,8 +121,39 @@
 export default {
   name: 'EnemyDeathStats',
   data() {
+    const baseUrl = import.meta.env.VITE_ENEMYSTATS_API_URL;
     return {
-      imgUrl: null,
+      // --- MODAL STATE ---
+      showModal: false,
+      modalImgUrl: '',
+      modalImgLabel: '',
+      chartList: [
+        {
+          key: 'enemy',
+          label: 'Muertes por enemigo',
+          shortLabel: 'Enemigo',
+          url: `${baseUrl}enemy-death-stats/image`
+        },
+        {
+          key: 'day',
+          label: 'Muertes por día',
+          shortLabel: 'Día',
+          url: `${baseUrl}enemy-death-stats/image/day`
+        },
+        {
+          key: 'user',
+          label: 'Muertes por usuario/jugador',
+          shortLabel: 'Usuario',
+          url: `${baseUrl}enemy-death-stats/image/user`
+        },
+        {
+          key: 'boss',
+          label: 'Muertes por boss',
+          shortLabel: 'Boss',
+          url: `${baseUrl}enemy-death-stats/image/boss`
+        }
+      ],
+      selectedChart: 0,
       loading: true,
       imageError: false,
       imageLoaded: false,
@@ -104,27 +168,29 @@ export default {
     }
   },
   methods: {
+    openModal(chart) {
+      this.modalImgUrl = chart.url;
+      this.modalImgLabel = chart.label;
+      this.showModal = true;
+    },
     handleImageError() {
       this.imageError = true;
       this.loading = false;
       this.showNotification('Failed to load death statistics', 'error', 'mdi-alert');
-      console.error('Failed to load image from URL:', this.imgUrl);
+      console.error('Failed to load image from URL:', this.chartList[this.selectedChart].url);
     },
     
     refreshImage() {
       this.loading = true;
       this.imageError = false;
       this.imageLoaded = false;
-      
-      // Añadir timestamp para evitar caché
+      // Añadir timestamp a todas las URLs para evitar caché
       const timestamp = new Date().getTime();
-      
-      // Usar la URL de Vite directamente sin reemplazo de "/"
-      const baseUrl = import.meta.env.VITE_ENEMYSTATS_API_URL;
-      this.imgUrl = `${baseUrl}stat_images/deaths_per_enemy.png?t=${timestamp}`;
-      
+      this.chartList = this.chartList.map(chart => ({
+        ...chart,
+        url: chart.url.split('?')[0] + '?t=' + timestamp
+      }));
       this.showNotification('Summoning fresh statistics', 'info', 'mdi-refresh');
-      
       // Set a timeout to ensure loading state shows for at least a moment
       setTimeout(() => {
         if (!this.imageLoaded) {
@@ -132,16 +198,17 @@ export default {
         }
       }, 2000);
     },
+    selectChart(idx) {
+      this.selectedChart = idx;
+      this.imageError = false;
+      this.imageLoaded = false;
+      // Opcional: podrías forzar recarga de imagen aquí si quieres
+    },
     
     loadImage() {
       this.loading = true;
-      
-      // Usar la URL de Vite directamente sin reemplazo de "/"
-      const baseUrl = import.meta.env.VITE_ENEMYSTATS_API_URL;
-      this.imgUrl = `${baseUrl}stat_images/deaths_per_enemy.png`;
-      
-      console.log('Loading image from URL:', this.imgUrl);
-      
+      this.imageError = false;
+      this.imageLoaded = false;
       // Set current date as last updated
       this.lastUpdated = new Intl.DateTimeFormat('es-ES', {
         day: '2-digit',
@@ -150,10 +217,8 @@ export default {
         hour: '2-digit',
         minute: '2-digit'
       }).format(new Date());
-      
       // También intentamos cargar información adicional
       this.fetchAdditionalStats();
-      
       // Set a timeout to ensure loading state shows for at least a moment
       setTimeout(() => {
         if (!this.imageLoaded) {
@@ -288,29 +353,10 @@ export default {
 .image-frame {
   background-color: rgba(40, 30, 20, 0.6) !important;
   border: 4px solid #704214 !important;
+}
   border-radius: 8px !important;
   overflow: hidden;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7) !important;
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.stats-img {
-  width: 100%;
-  display: block;
-  object-fit: contain;
-  max-height: 500px;
-}
-
-.image-caption {
-  background-color: rgba(40, 30, 20, 0.8);
-  color: #e6ccb3;
-  font-family: 'Cinzel', serif;
-  padding: 10px;
-  text-align: center;
-  border-top: 2px solid #704214;
-}
 
 .caption-text {
   font-size: 1rem;
@@ -319,32 +365,39 @@ export default {
   letter-spacing: 1px;
 }
 
-.debug-info {
-  margin-top: 20px;
-  font-family: 'Philosopher', sans-serif;
-  color: #e6ccb3;
-  background-color: rgba(80, 40, 20, 0.4);
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #704214;
-  text-align: left;
-  font-size: 0.9rem;
-}
-
-.empty-stats {
+.tab-img-wrapper {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 300px;
-  color: #e6ccb3;
-  text-align: center;
-  font-family: 'Cinzel', serif;
+  justify-content: flex-start;
+  min-height: 0;
+  max-height: 72vh;
 }
-
-.empty-text {
-  margin-top: 20px;
-  font-size: 1.2rem;
+.img-scroll-box {
+  width: 100%;
+  max-width: 100%;
+  max-height: 70vh;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  background: #f9f3e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.stats-img-tab {
+  max-width: 100%;
+  max-height: 68vh;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  background: #f9f3e6;
+  cursor: zoom-in;
 }
 
 .stats-footer {
