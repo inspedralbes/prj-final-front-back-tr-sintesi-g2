@@ -42,6 +42,7 @@ require('dotenv').config({ path: './environment/.env' });
     //startBossService();
     //startShopService();
     //startItemService();
+    
     //await seedItems(); // 👈 esto inserta los items en la DB
     //await seedGames(); // 👈 esto inserta los juegos en la DB
     //await seedPlayers(); // 👈 esto inserta los jugadores en la DB
@@ -49,6 +50,7 @@ require('dotenv').config({ path: './environment/.env' });
     //await seedBosses(); // 👈 esto inserta los jefes en la DB
     //await seedInventory(); // 👈 esto inserta los inventarios en la DB
     //await seedShop(); // 👈 esto inserta los tiendas en la DB
+    await seedEnemyDeathStats(); // 👈 esto inserta las estadísticas de muertes en la DB
     console.log('Todos los servicios iniciados correctamente');
   } catch (error) {
     console.error('Error:', error);

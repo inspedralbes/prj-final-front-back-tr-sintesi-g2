@@ -50,7 +50,7 @@ services:
       - mysql
     command: >
       sh -c "
-        apk add --no-cache python3 py3-pip py3-numpy py3-matplotlib py3-pandas py3-seaborn py3-setuptools py3-wheel py3-pymysql &&
+        apk add --no-cache python3 py3-pip py3-numpy py3-matplotlib py3-pandas py3-seaborn py3-setuptools py3-wheel py3-pymysql py3-sqlalchemy &&
         sleep 5 &&
         npm install &&
         npm run dev
