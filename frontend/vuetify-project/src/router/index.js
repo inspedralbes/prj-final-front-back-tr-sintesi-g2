@@ -14,9 +14,8 @@ import Game from '@/components/GameView.vue'
 const routes = [
   {
     path: '/',
-    redirect: () => {
-      return localStorage.getItem('token') ? '/dashboard' : '/login'
-    }
+    name: 'gameview',
+    component: Game,
   },
   {
     path: '/login',
@@ -36,7 +35,6 @@ const routes = [
   },
   {
     path: '/gameview',
-    name: 'gameview',
     component: Game,
   }
 ]
@@ -48,7 +46,7 @@ const router = createRouter({
 
 // Protección de rutas
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/register'];
+  const publicPages = ['/', '/login', '/register', '/gameview'];
   const authRequired = !publicPages.includes(to.path);
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || 'null');
@@ -64,11 +62,7 @@ router.beforeEach((to, from, next) => {
     return next('/login');
   }
 
-  // Protege la ruta de 'gameview', asegurándote de que no está prohibido el acceso por el rol
-  if (to.path === '/gameview' && (!user || user.role === 'admin')) {
-    alert('Acceso denegado: solo usuarios pueden acceder a GameView');
-    return next('/login');
-  }
+
 
   next(); // Todo ok, continuar
 });
