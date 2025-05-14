@@ -4,7 +4,7 @@
     <header class="game-header">
   <div class="title-wrapper">
     <v-icon large class="mr-2 crown-icon">mdi-shield-plus</v-icon>
-    <h1 class="game-title">Mi Juego Medieval</h1>
+    <h1 class="game-title">The Last Knight Of Averon</h1>
     <v-icon large class="ml-2 crown-icon">mdi-shield-plus</v-icon>
 
   </div>
@@ -17,20 +17,20 @@
         <div id="unity-container" class="unity-placeholder">
           <!-- Pantalla de carga antes de iniciar el juego -->
           <div v-if="!gameStarted" class="game-placeholder">
-            <h2 class="medieval-subtitle">¡Prepárate para la aventura!</h2>
+            <h2 class="medieval-subtitle">Get ready for the adventure!</h2>
             <v-btn 
               @click="startGame" 
               class="refresh-btn mt-4"
               elevation="2"
               :loading="loading"
             >
-              <span class="btn-text">INICIAR JUEGO</span>
+              <span class="btn-text">START GAME</span>
             </v-btn>
           </div>
           
           <!-- Pantalla de carga mientras se carga Unity -->
           <div v-else-if="loading" class="game-loading">
-            <h3 class="medieval-subtitle">Cargando el reino...</h3>
+            <h3 class="medieval-subtitle">Loading the kingdom...</h3>
             <v-progress-linear
               indeterminate
               color="#DAA520"
@@ -50,7 +50,7 @@
               icon
               class="control-btn"
               @click="toggleFullscreen"
-              title="Pantalla completa"
+              title="Full screen"
               >
               <v-icon>mdi-fullscreen</v-icon>
               </v-btn>
@@ -61,15 +61,16 @@
       
       <!-- Instrucciones -->
       <div class="instructions-panel parchment-card">
-        <h2 class="instructions-title">INSTRUCCIONES</h2>
+        <h2 class="instructions-title">INSTRUCTIONS</h2>
         <v-divider class="divider mb-4"></v-divider>
         <div class="instructions-content">
           <ul class="instructions-list">
-            <li>Utiliza <b>W, A, S, D</b> para moverte por el reino</li>
-            <li>Presiona <b>ESPACIO</b> para saltar obstáculos</li>
-            <li>Usa el <b>MOUSE</b> para mirar alrededor</li>
-            <li>Presiona <b>E</b> para interactuar con objetos y personajes</li>
-            <li>Presiona <b>ESC</b> para pausar la aventura</li>
+            <li>Use <b>W, A, S, D</b> to move around the kingdom</li>
+            <li>Press <b>SPACE</b> to jump over obstacles</li>
+            <li>Press <b>I</b> to open the inventory</li>
+            <li>Use the <b>LEFT CLICK</b> to atack with the sword</li>
+            <li>Use the <b>RIGHT CLICK</b> to atack with mana</li>
+            <li>Press <b>ESC</b> to pause the adventure</li>
           </ul>
         </div>
       </div>
@@ -77,16 +78,14 @@
 
   <!-- Botón flotante de Login -->
   <v-btn
-    color="primary"
-    class="floating-login-btn"
-    fab
-    large
-    elevation="12"
-    @click="goToLogin"
-    title="Ir a Login"
-  >
-    <v-icon large>mdi-login</v-icon>
-  </v-btn>
+  class="login-btn"
+  @click="goToLogin"
+  elevation="2"
+>
+  <v-icon left>mdi-login</v-icon>
+  <span class="btn-text">GO TO LOGIN</span>
+</v-btn>
+
 </div>
 </template>
 
@@ -324,6 +323,21 @@ document.addEventListener("keydown", this.handleCustomFullscreenExit);
 </script>
 
 <style scoped>
+.login-btn {
+  background-color: #6b4226 !important;
+  border: 1px solid #704214 !important;
+  color: #e6ccb3 !important;
+  font-family: 'Cinzel', serif !important;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.btn-text {
+  font-family: 'Cinzel', serif;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
 /* Estilos generales */
 .game-container {
   width: 100%;

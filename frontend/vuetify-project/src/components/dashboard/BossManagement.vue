@@ -260,6 +260,19 @@
       </v-card>
     </v-dialog>
   </v-container>
+  <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="3000"
+      bottom
+      right
+      class="medieval-snackbar"
+    >
+      <div class="snackbar-content">
+        <v-icon left>{{ snackbar.icon }}</v-icon>
+        {{ snackbar.text }}
+      </div>
+    </v-snackbar>
 </template>
 
 <script>
@@ -267,6 +280,12 @@ export default {
   name: 'BossManagement',
   data() {
     return {
+      snackbar: {
+      show: false,
+      text: '',
+      color: '',
+      icon: ''
+    },
       bosses: [],
       loading: false,
       headers: [
@@ -304,10 +323,21 @@ export default {
         const response = await fetch(`${import.meta.env.VITE_BOSS_API_URL}bosses`)
         if (!response.ok) throw new Error('Error loading bosses')
         this.bosses = await response.json()
+        this.showNotification('Bosses loaded successfully', 'success', 'mdi-check-circle');
       } catch (error) {
-        console.error('Error loading bosses:', error)
-      }
-      this.loading = false
+        this.showNotification('Failed to load bosses', 'error', 'mdi-alert');
+        console.error('Error loading bosses:', error);
+      } finally {
+        this.loading = false;
+    }
+    },
+    showNotification(text, color, icon) {
+      this.snackbar = {
+        show: true,
+        text,
+        color,
+        icon
+      };
     },
     editBoss(item) {
       this.editedBoss = {
@@ -342,11 +372,13 @@ export default {
             reward_item: Number(this.editedBoss.rewardItem) || null
           })
         })
-        if (!response.ok) throw new Error('Error updating boss')
-        await this.loadBosses()
-        this.closeEdit()
+        if (!response.ok) throw new Error('Error updating boss');
+        await this.loadBosses();
+        this.closeEdit();
+        this.showNotification('Boss updated successfully', 'success', 'mdi-check-circle');
       } catch (error) {
         console.error('Error updating boss:', error)
+        this.showNotification('Failed to update boss', 'error', 'mdi-alert');
       }
     },
     closeEdit() {

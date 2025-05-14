@@ -18,42 +18,42 @@ if (!fs.existsSync(LOG_DIR)) {
 // Servicios disponibles
 const services = {
   player: {
-    name: 'Servicio de Jugadores',
+    name: 'Service of Players',
     port: process.env.PLAYER_PORT || 3001,
     script: path.join(__dirname, 'services/playerService.js')
   },
   game: {
-    name: 'Servicio de Partidas',
+    name: 'Service of Games',
     port: process.env.GAME_PORT || 3002,
     script: path.join(__dirname, 'services/gameService.js')
   },
   inventory: {
-    name: 'Servicio de Inventario',
+    name: 'Service of Inventory',
     port: process.env.INVENTORY_PORT || 3003,
     script: path.join(__dirname, 'services/inventoryService.js')
   },
   item: {
-    name: 'Servicio de Objetos',
+    name: 'Service of Items',
     port: process.env.ITEM_PORT || 3005,
     script: path.join(__dirname, 'services/itemService.js')
   },
   enemy: {
-    name: 'Servicio de Enemigos',
+    name: 'Service of Enemy',
     port: process.env.ENEMY_PORT || 3007,
     script: path.join(__dirname, 'services/enemyService.js')
   },
   boss: {
-    name: 'Servicio de Jefes',
+    name: 'Service of Bosses',
     port: process.env.BOSS_PORT || 3008,
     script: path.join(__dirname, 'services/bossService.js')
   },
   shop: {
-    name: 'Servicio de Tienda',
+    name: 'Service of Shop',
     port: process.env.SHOP_PORT || 3009,
     script: path.join(__dirname, 'services/shopService.js')
   },
   'enemy-death-stats': {
-    name: 'Servicio de Estadísticas de Muertes de Enemigos',
+    name: 'Service of Stats',
     port: process.env.ENEMY_DEATH_STAT_PORT || 3010,
     script: path.join(__dirname, 'services/enemyDeathStatService.js')
   },

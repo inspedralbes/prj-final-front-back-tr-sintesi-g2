@@ -6,7 +6,7 @@
           <v-card-title class="card-title text-center mb-4 d-flex align-center justify-center">
             <div class="title-wrapper">
               <v-icon large class="mr-2 crown-icon">mdi-shield-plus</v-icon>
-              <span class="title-text">REGISTRO</span>
+              <span class="title-text">REGISTRATION</span>
               <v-icon large class="ml-2 crown-icon">mdi-shield-plus</v-icon>
             </div>
           </v-card-title>
@@ -17,7 +17,7 @@
             <v-form @submit.prevent="handleRegister" v-model="isValid" class="mt-4">
               <v-text-field
                 v-model="username"
-                label="Nombre de usuario"
+                label="Username"
                 required
                 :rules="[rules.required]"
                 prepend-icon="mdi-account"
@@ -36,7 +36,7 @@
 
               <v-text-field
                 v-model="password"
-                label="Contraseña"
+                label="Password"
                 :type="showPassword ? 'text' : 'password'"
                 required
                 :rules="[rules.required, rules.password]"
@@ -48,7 +48,7 @@
 
               <v-text-field
                 v-model="confirmPassword"
-                label="Confirmar contraseña"
+                label="Confrim Password"
                 :type="showConfirmPassword ? 'text' : 'password'"
                 required
                 :rules="[rules.required, rules.passwordMatch]"
@@ -78,7 +78,7 @@
                   class="refresh-btn mb-4"
                   elevation="2"
                 >
-                  <span class="btn-text">REGISTRARSE</span>
+                  <span class="btn-text">REGISTER</span>
                 </v-btn>
                 <div class="text-center">
                   <v-btn
@@ -86,7 +86,7 @@
                     class="login-link"
                     @click="$router.push('/login')"
                   >
-                    <span class="login-text">¿Ya tienes cuenta? Inicia sesión</span>
+                    <span class="login-text">Already have an account? Log in</span>
                   </v-btn>
                 </div>
               </div>
@@ -133,10 +133,10 @@ export default {
         icon: ''
       },
       rules: {
-        required: v => !!v || 'Este campo es requerido',
-        email: v => /.+@.+\..+/.test(v) || 'El email debe ser válido',
-        password: v => v.length >= 6 || 'La contraseña debe tener al menos 6 caracteres',
-        passwordMatch: v => v === this.password || 'Las contraseñas no coinciden'
+        required: v => !!v || 'This field is required',
+        email: v => /.+@.+\..+/.test(v) || 'The email must be valid',
+        password: v => v.length >= 6 || 'The password must be at least 6 characters long',
+        passwordMatch: v => v === this.password || 'the passwords do not match'
       }
     };
   },
@@ -161,16 +161,16 @@ export default {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || 'Error al registrarse');
+          throw new Error(data.message || 'Error to register');
         }
 
-        this.showNotification('¡Registro realizado correctamente!', 'success', 'mdi-check-circle');
+        this.showNotification('Register successful', 'success', 'mdi-check-circle');
 
         setTimeout(() => {
           this.$router.push('/login'); // o '/login'
         }, 1000);
       } catch (error) {
-        this.error = error.message || 'Error al registrarse';
+        this.error = error.message || 'Error to register';
       } finally {
         this.loading = false;
       }
