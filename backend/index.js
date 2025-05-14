@@ -33,17 +33,17 @@ require('dotenv').config({ path: './environment/.env' });
     console.log('Conexión a la base de datos establecida correctamente.');
     await sequelize.sync({ force: false }); // 👈 esto sincroniza los modelos con la DB
     // Iniciar microservicios
-    //tartPlayerService();
-    //startGameService();
-    //startInventoryService();
+    startPlayerService();
+    startGameService();
+    startInventoryService();
     startUserService();
-    //startEnemyDeathStatService();
-    //startEnemyService();
-    //startBossService();
-    //startShopService();
-    //startItemService();
+    startEnemyDeathStatService();
+    startEnemyService();
+    startBossService();
+    startShopService();
+    startItemService();
     
-    //await seedItems(); // 👈 esto inserta los items en la DB
+    await seedItems(); // 👈 esto inserta los items en la DB
     //await seedGames(); // 👈 esto inserta los juegos en la DB
     //await seedPlayers(); // 👈 esto inserta los jugadores en la DB
     //await seedEnemies(); // 👈 esto inserta los enemigos en la DB

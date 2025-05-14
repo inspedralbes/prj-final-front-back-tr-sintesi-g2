@@ -8,7 +8,7 @@
         item_type: 'llave',
         value: 100,
         rarity: 'rare',
-        item_image: 'backend/imagenes/llave-roja.png'
+        item_image: 'llave-roja.png'
       },
       {
         item_name: 'Poción de Vida',
@@ -16,7 +16,7 @@
         item_type: 'pocion',
         value: 50,
         rarity: 'common',
-        item_image: 'backend/imagenes/pocionVida.png'
+        item_image: 'pocionVida.png'
       },
       {
         item_name: 'Poción de Maná',
@@ -24,7 +24,7 @@
         item_type: 'pocion',
         value: 50,
         rarity: 'common',
-        item_image: 'backend/imagenes/pocionMana.png'
+        item_image: 'pocionMana.png'
       },
       {
         item_name: 'Llave Morada',
@@ -32,7 +32,7 @@
         item_type: 'llave',
         value: 150,
         rarity: 'rare',
-        item_image: 'backend/imagenes/llave-morada.png'
+        item_image: 'llave-morada.png'
       },
       {
         item_name: 'Llave Dorada',
@@ -40,7 +40,7 @@
         item_type: 'llave',
         value: 200,
         rarity: 'epic',
-        item_image: 'backend/imagenes/llave-dorada.png'
+        item_image: 'llave-dorada.png'
       },
       {
         item_name: 'Llave Esqueleto',
@@ -48,7 +48,7 @@
         item_type: 'llave',
         value: 150,
         rarity: 'rare',
-        item_image: 'backend/imagenes/llave-esqueleto.png'
+        item_image: 'llave-esqueleto.png'
       },
       {
         item_name: 'Llave Lobo',
@@ -56,7 +56,7 @@
         item_type: 'llave',
         value: 100,
         rarity: 'uncommon',
-        item_image: 'backend/imagenes/llave-lobo.png'
+        item_image: 'llave-lobo.png'
       },
       {
         item_name: 'Llave Dragón',
@@ -64,7 +64,7 @@
         item_type: 'llave',
         value: 300,
         rarity: 'epic',
-        item_image: 'backend/imagenes/llave-dragon.png'
+        item_image: 'llave-dragon.png'
       }
     ];
 
