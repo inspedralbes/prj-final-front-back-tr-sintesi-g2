@@ -328,6 +328,19 @@
       </v-card>
     </v-dialog>
   </v-container>
+  <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="3000"
+      bottom
+      right
+      class="medieval-snackbar"
+    >
+      <div class="snackbar-content">
+        <v-icon left>{{ snackbar.icon }}</v-icon>
+        {{ snackbar.text }}
+      </div>
+    </v-snackbar>
 </template>
 
 <script>
@@ -368,20 +381,37 @@ export default {
         reduced_damage: 0,
         attack_cooldown: 0,
         coin_reward: 0
+      },
+      snackbar: {
+        show: false,
+        text: '',
+        color: 'info',
+        icon: 'mdi-information'
       }
     }
   },
   methods: {
     async loadEnemies() {
-      this.loading = true
+      this.loading = true;
       try {
-        const response = await fetch(`${import.meta.env.VITE_ENEMY_API_URL}enemies`)
-        if (!response.ok) throw new Error('Error loading enemies')
-        this.enemies = await response.json()
+        const response = await fetch(`${import.meta.env.VITE_ENEMY_API_URL}enemies`);
+        if (!response.ok) throw new Error('Error loading enemies');
+        this.enemies = await response.json();
+        this.showNotification('Enemies loaded successfully', 'success', 'mdi-check-circle');
       } catch (error) {
-        console.error('Error loading enemies:', error)
+        this.showNotification('Failed to load enemies', 'error', 'mdi-alert');
+        console.error('Error loading enemies:', error);
+      } finally {
+        this.loading = false;
       }
-      this.loading = false
+    },
+    showNotification(text, color, icon) {
+      this.snackbar = {
+        show: true,
+        text,
+        color,
+        icon
+      };
     },
     editEnemy(enemy) {
       this.editedEnemy = { ...enemy }
@@ -407,16 +437,18 @@ export default {
             attack_cooldown: Number(this.editedEnemy.attack_cooldown),
             coin_reward: Number(this.editedEnemy.coin_reward)
           })
-        })
-        if (!response.ok) throw new Error('Error updating enemy')
-        await this.loadEnemies()
-        this.closeEdit()
+        });
+        if (!response.ok) throw new Error('Error updating enemy');
+        await this.loadEnemies();
+        this.closeEdit();
+        this.showNotification('Enemy updated successfully', 'success', 'mdi-check-circle');
       } catch (error) {
-        console.error('Error updating enemy:', error)
+        console.error('Error updating enemy:', error);
+        this.showNotification('Failed to update enemy', 'error', 'mdi-alert');
       }
     },
     closeEdit() {
-      this.dialogEdit = false
+      this.dialogEdit = false;
       this.editedEnemy = {
         id_enemy: null,
         enemy_name: '',

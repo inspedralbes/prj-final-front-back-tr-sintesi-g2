@@ -6,7 +6,7 @@
           <v-card-title class="card-title text-center mb-4 d-flex align-center justify-center">
             <div class="title-wrapper">
               <v-icon large class="mr-2 crown-icon">mdi-shield-key</v-icon>
-              <span class="title-text">INICIAR SESIÓN</span>
+              <span class="title-text">LOG IN (Only admin)</span>
               <v-icon large class="ml-2 crown-icon">mdi-shield-key</v-icon>
             </div>
           </v-card-title>
@@ -27,7 +27,7 @@
 
               <v-text-field
                 v-model="password"
-                label="Contraseña"
+                label="Password"
                 :type="showPassword ? 'text' : 'password'"
                 required
                 :rules="[rules.required]"
@@ -57,7 +57,7 @@
                   class="refresh-btn mb-4"
                   elevation="2"
                 >
-                  <span class="btn-text">INICIAR SESIÓN</span>
+                  <span class="btn-text">LOG IN</span>
                 </v-btn>
                 <div class="text-center">
                   <v-btn
@@ -65,9 +65,18 @@
                     class="register-link"
                     @click="$router.push('/register')"
                   >
-                    <span class="register-text">¿No tienes cuenta? Regístrate</span>
+                    <span class="register-text">Don't have an account? Register</span>
                   </v-btn>
                 </div>
+                <div class="text-center mt-2">
+                <v-btn
+                  variant="text"
+                  class="register-link"
+                  @click="$router.push('/gameview')"
+                >
+                  <span class="register-text">Go back to the game</span>
+                </v-btn>
+              </div>
               </div>
             </v-form>
           </v-card-text>
@@ -109,8 +118,8 @@ export default {
         icon: ''
       },
       rules: {
-        required: v => !!v || 'Este campo es requerido',
-        email: v => /.+@.+\..+/.test(v) || 'El email debe ser válido'
+        required: v => !!v || 'This field is required',
+        email: v => /.+@.+\..+/.test(v) || 'email must be valid'
       }
     };
   },
@@ -134,7 +143,7 @@ export default {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Error al iniciar sesión');
+      throw new Error(data.message || 'Error to login');
     }
 
     // Guardar el token y el usuario en localStorage
@@ -143,19 +152,19 @@ export default {
 
     // Verificar el rol y redirigir según el rol
     if (data.user.role === 'admin') {
-      this.showNotification('Has ingresado al reino con éxito', 'success', 'mdi-check-circle');
+      this.showNotification('Welcome to the admin dashboard', 'success', 'mdi-check-circle');
       setTimeout(() => {
         this.$router.push('/dashboard'); // Redirige al dashboard si es admin
       }, 1000);
     } else if (data.user.role === 'user') {
-      this.showNotification('Bienvenido al juego', 'success', 'mdi-check-circle');
+      this.showNotification('Welcome to the game', 'success', 'mdi-check-circle');
       setTimeout(() => {
         this.$router.push('/gameview'); // Redirige al gameview si es un user
       }, 1000);
     }
 
   } catch (error) {
-    this.error = error.message || 'Error al iniciar sesión';
+    this.error = error.message || 'Error to login';
   } finally {
     this.loading = false;
   }

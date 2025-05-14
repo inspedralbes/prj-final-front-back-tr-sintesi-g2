@@ -7,9 +7,6 @@
 </template>
 
 <script setup>
-  window.addEventListener('beforeunload', () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-});
+
 
 </script>

@@ -6,7 +6,7 @@
           <v-card-title class="card-title d-flex align-center">
             <div class="title-wrapper">
               <v-icon large class="mr-2 crown-icon">mdi-crown</v-icon>
-              <span class="title-text">PANEL DE CONTROL</span>
+              <span class="title-text">CONTROL PANEL</span>
               <v-icon large class="ml-2 crown-icon">mdi-crown</v-icon>
             </div>
             <v-spacer></v-spacer>
@@ -19,7 +19,7 @@
               elevation="2"
             >
               <v-icon left>mdi-tools</v-icon>
-              <span class="btn-text">MANTENIMIENTO</span>
+              <span class="btn-text">MAINTENANCE</span>
             </v-btn>
             
             <!-- Botón de logout -->
@@ -29,7 +29,7 @@
               @click="handleLogout"
               elevation="2"
             >
-              <span class="btn-text">SALIR</span>
+              <span class="btn-text">EXIT</span>
               <v-icon right>mdi-exit-to-app</v-icon>
             </v-btn>
           </v-card-title>
@@ -45,31 +45,31 @@
           >
             <v-tab value="players" class="tab-item">
               <v-icon left>mdi-account-group</v-icon>
-              <span class="tab-text">JUGADORES</span>
+              <span class="tab-text">PLAYERS</span>
             </v-tab>
             <v-tab value="enemies" class="tab-item">
               <v-icon left>mdi-sword-cross</v-icon>
-              <span class="tab-text">ENEMIGOS</span>
+              <span class="tab-text">ENEMIES</span>
             </v-tab>
             <v-tab value="bosses" class="tab-item">
               <v-icon left>mdi-spider</v-icon>
-              <span class="tab-text">JEFES</span>
+              <span class="tab-text">BOSSES</span>
             </v-tab>
             <v-tab value="games" class="tab-item">
               <v-icon left>mdi-dice-multiple</v-icon>
-              <span class="tab-text">PARTIDAS</span>
+              <span class="tab-text">GAMES</span>
             </v-tab>
             <v-tab value="items" class="tab-item">
               <v-icon left>mdi-treasure-chest</v-icon>
-              <span class="tab-text">OBJETOS</span>
+              <span class="tab-text">ITEMS</span>
             </v-tab>
             <v-tab value="shop" class="tab-item">
               <v-icon left>mdi-store</v-icon>
-              <span class="tab-text">TIENDA</span>
+              <span class="tab-text">SHOP</span>
             </v-tab>
             <v-tab value="enemy-death-stats" class="tab-item">
               <v-icon left>mdi-skull-crossbones</v-icon>
-              <span class="tab-text">ESTADÍSTICAS</span>
+              <span class="tab-text">STATISTICS</span>
             </v-tab>
           </v-tabs>
         </v-card>
@@ -122,13 +122,13 @@
     <v-dialog v-model="logoutDialog" max-width="400" class="medieval-dialog">
       <v-card class="parchment-card">
         <v-card-title class="card-title">
-          <span class="dialog-title">CONFIRMAR SALIDA</span>
+          <span class="dialog-title">CONFIRM EXIT</span>
         </v-card-title>
         
         <v-divider class="divider"></v-divider>
         
         <v-card-text class="dialog-content">
-          ¿Estás seguro que deseas abandonar el reino?
+          Are you sure you want to leave the dashboard?
         </v-card-text>
         
         <v-divider class="divider"></v-divider>
@@ -136,10 +136,10 @@
         <v-card-actions class="dialog-actions">
           <v-spacer></v-spacer>
           <v-btn class="cancel-btn" @click="logoutDialog = false">
-            <span class="btn-text">CANCELAR</span>
+            <span class="btn-text">CANCEL</span>
           </v-btn>
           <v-btn class="confirm-btn" @click="confirmLogout">
-            <span class="btn-text">CONFIRMAR</span>
+            <span class="btn-text">CONFIRM</span>
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -151,7 +151,7 @@
         <v-card-title class="card-title">
           <div class="title-wrapper">
             <v-icon left>mdi-tools</v-icon>
-            <span class="dialog-title">MANTENIMIENTO DE SERVICIOS</span>
+            <span class="dialog-title">SERVICE MAINTENANCE</span>
           </div>
           <v-spacer></v-spacer>
         </v-card-title>
@@ -188,7 +188,7 @@
                 <v-icon left small>
                   {{ item.status === 'ONLINE' ? 'mdi-power-off' : 'mdi-power' }}
                 </v-icon>
-                {{ item.status === 'ONLINE' ? 'DETENER' : 'INICIAR' }}
+                {{ item.status === 'ONLINE' ? 'STOP' : 'START' }}
               </v-btn>
             </template>
           </v-data-table>
@@ -205,14 +205,14 @@
             class="refresh-btn"
           >
             <v-icon left>mdi-refresh</v-icon>
-            <span class="btn-text">ACTUALIZAR</span>
+            <span class="btn-text">UPDATE</span>
           </v-btn>
           <v-btn 
             color="secondary" 
             @click="maintenanceDialog = false" 
             class="close-btn"
           >
-            <span class="btn-text">CERRAR</span>
+            <span class="btn-text">CLOSE</span>
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -258,7 +258,7 @@ export default {
       services: [
         {
           id: 1,
-          name: 'Servicio de Jugadores',
+          name: 'Service of Players',
           status: 'OFFLINE',
           port: '3001',
           serviceType: 'player',
@@ -266,7 +266,7 @@ export default {
         },
         {
           id: 2,
-          name: 'Servicio de Partidas',
+          name: 'Service of Games',
           status: 'OFFLINE',
           port: '3002',
           serviceType: 'game',
@@ -274,7 +274,7 @@ export default {
         },
         {
           id: 3,
-          name: 'Servicio de Inventario',
+          name: 'Service of Inventory',
           status: 'OFFLINE',
           port: '3003',
           serviceType: 'inventory',
@@ -282,7 +282,7 @@ export default {
         },
         {
           id: 5,
-          name: 'Servicio de Objetos',
+          name: 'Service of Items',
           status: 'OFFLINE',
           port: '3005',
           serviceType: 'item',
@@ -290,7 +290,7 @@ export default {
         },
         {
           id: 6,
-          name: 'Servicio de Enemigos',
+          name: 'Service of Enemy',
           status: 'OFFLINE',
           port: '3007',
           serviceType: 'enemy',
@@ -298,7 +298,7 @@ export default {
         },
         {
           id: 7,
-          name: 'Servicio de Jefes',
+          name: 'Service of Bosses',
           status: 'OFFLINE',
           port: '3008',
           serviceType: 'boss',
@@ -306,7 +306,7 @@ export default {
         },
         {
           id: 8,
-          name: 'Servicio de Tienda',
+          name: 'Service of Shop',
           status: 'OFFLINE',
           port: '3009',
           serviceType: 'shop',
@@ -314,7 +314,7 @@ export default {
         },
         {
           id: 9,
-          name: 'Servicio de Estadísticas',
+          name: 'Service of Stats',
           status: 'OFFLINE',
           port: '3010',
           serviceType: 'enemy-death-stats',
@@ -393,7 +393,7 @@ updateServiceStatusFromSocket(serviceData) {
   if (index !== -1) {
     this.services[index] = { ...serviceData, loading: false };
     this.showNotification(
-      `Servicio ${serviceData.name} ahora está ${serviceData.status}`,
+      `${serviceData.name} now is ${serviceData.status}`,
       serviceData.status === 'ONLINE' ? 'success' : 'error',
       serviceData.status === 'ONLINE' ? 'mdi-power' : 'mdi-power-off'
     );
@@ -410,7 +410,7 @@ updateServiceStatusFromSocket(serviceData) {
       localStorage.removeItem('user');
       
       // Mostrar notificación
-      this.showNotification('Has abandonado el reino', 'info', 'mdi-exit-to-app');
+      this.showNotification('You left the kingdom', 'info', 'mdi-exit-to-app');
       
       // Cerrar el diálogo
       this.logoutDialog = false;
@@ -459,14 +459,14 @@ updateServiceStatusFromSocket(serviceData) {
             }
           });
           
-          this.showNotification('Estado de servicios actualizado', 'info', 'mdi-refresh');
+          this.showNotification('State of the services updated', 'info', 'mdi-refresh');
         } else {
-          this.showNotification('Error al obtener el estado de los servicios', 'warning', 'mdi-alert');
+          this.showNotification('Error retrieving service status', 'warning', 'mdi-alert');
         }
-      } catch (error) {
-        console.error('Error al obtener el estado de los servicios:', error);
-        this.showNotification('Error de conexión con el servidor de control', 'error', 'mdi-alert-circle');
-      } finally {
+        } catch (error) {
+          console.error('Error retrieving service status:', error);
+          this.showNotification('Connection error with the control server', 'error', 'mdi-alert-circle');
+        }finally {
         this.loading = false;
       }
     },
@@ -480,7 +480,7 @@ updateServiceStatusFromSocket(serviceData) {
     // Espera al evento socket para actualizar el estado real y quitar loading
   } catch (error) {
     this.showNotification(
-      `Error de conexión: No se pudo ${service.status === 'ONLINE' ? 'detener' : 'iniciar'} el servicio`,
+      `Error of connection: they can't ${service.status === 'ONLINE' ? 'stop' : 'start'} the service`,
       'error',
       'mdi-alert-circle'
     );
