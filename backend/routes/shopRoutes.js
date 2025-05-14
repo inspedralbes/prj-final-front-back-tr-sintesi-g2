@@ -278,6 +278,46 @@ const startShopService = () => {
     }
   });
 
+  // UNITY ENDPOINTS
+
+   // Endpoint personalizado que devuelve solo skin_name y price en formato JSON
+   app.get('/shop/json/skins', async (req, res) => {
+    try {
+      const skins = await Shop.findAll({
+        attributes: ['skin_name', 'price'],
+        where: { is_available: true } // opcional: solo skins disponibles
+      });
+
+      res.json({ skins });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Endpoint para descargar un zip de la carpeta Portadas
+  app.get('/shop/zip/portadas', (req, res) => {
+    const folderPath = path.join(__dirname, '../imagenes/shop/Portadas/');
+  
+    if (!fs.existsSync(folderPath)) {
+      return res.status(404).json({ message: 'La carpeta "Portadas" no fue encontrada.' });
+    }
+  
+    const zipName = 'Portadas.zip';
+    res.setHeader('Content-Disposition', `attachment; filename=${zipName}`);
+    res.setHeader('Content-Type', 'application/zip');
+  
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
+  
+    archive.on('error', (err) => {
+      res.status(500).send({ error: err.message });
+    });
+  
+    archive.pipe(res);
+    archive.directory(folderPath, false);  // <-- Cambio aquí
+    archive.finalize();
+  });
   // Endpoint para descargar un zip de una skin
   app.get('/shop/zip/:skinName', (req, res) => {
     const rawName = req.params.skinName;

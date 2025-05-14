@@ -7,6 +7,7 @@ const startItemService = () => {
   const app = express();
   app.use(express.json());
   app.use(cors());
+  
   app.use('/imagenes', express.static(path.join(__dirname, '../imagenes'), {
     setHeaders: (res, path) => {
       res.set('Access-Control-Allow-Origin', '*');

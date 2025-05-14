@@ -12,6 +12,18 @@ const Player = sequelize.define('Player', {
     allowNull: false,
     unique: true
   },
+  selectedSkin: {
+    type: DataTypes.STRING(50),
+    defaultValue: "John"
+  },
+  purchasedSkins: {
+    type: DataTypes.JSON,
+    defaultValue: ["John"]
+  },  
+  coins: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
   creation_date: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
