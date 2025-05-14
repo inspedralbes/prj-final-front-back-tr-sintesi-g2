@@ -41,66 +41,66 @@
         </template>
         
         <!-- Health Stat -->
-        <template v-slot:item.boss_max_health="{ item }">
+        <template v-slot:item.bossMaxHealth="{ item }">
           <div class="stat-wrapper">
             <v-icon small color="#8B0000" class="mr-1">mdi-heart</v-icon>
-            {{ item.boss_max_health }}
+            {{ item.bossMaxHealth }}
           </div>
         </template>
         
         <!-- Attack1 Damage Stat -->
-        <template v-slot:item.attack1_damage="{ item }">
+        <template v-slot:item.attack1Damage="{ item }">
           <div class="stat-wrapper">
             <v-icon small color="#DAA520" class="mr-1">mdi-sword</v-icon>
-            {{ item.attack1_damage }}
+            {{ item.attack1Damage }}
           </div>
         </template>
         
         <!-- Attack2 Damage Stat -->
-        <template v-slot:item.attack2_damage="{ item }">
+        <template v-slot:item.attack2Damage="{ item }">
           <div class="stat-wrapper">
             <v-icon small color="#FF6347" class="mr-1">mdi-flare</v-icon>
-            {{ item.attack2_damage }}
+            {{ item.attack2Damage }}
           </div>
         </template>
         
         <!-- Move Speed Stat -->
-        <template v-slot:item.move_speed="{ item }">
+        <template v-slot:item.moveSpeed="{ item }">
           <div class="stat-wrapper">
             <v-icon small color="#1E90FF" class="mr-1">mdi-run-fast</v-icon>
-            {{ item.move_speed }}
+            {{ item.moveSpeed }}
           </div>
         </template>
         
         <!-- Attack Range Stat -->
-        <template v-slot:item.attack_range="{ item }">
+        <template v-slot:item.attackRange="{ item }">
           <div class="stat-wrapper">
             <v-icon small color="#FF6347" class="mr-1">mdi-target</v-icon>
-            {{ item.attack_range }}
+            {{ item.attackRange }}
           </div>
         </template>
         
         <!-- Vision Range Stat -->
-        <template v-slot:item.vision_range="{ item }">
+        <template v-slot:item.visionRange="{ item }">
           <div class="stat-wrapper">
             <v-icon small color="#9370DB" class="mr-1">mdi-eye</v-icon>
-            {{ item.vision_range }}
+            {{ item.visionRange }}
           </div>
         </template>
         
         <!-- Attack Cooldown Stat -->
-        <template v-slot:item.attack_cooldown="{ item }">
+        <template v-slot:item.attackCooldown="{ item }">
           <div class="stat-wrapper">
             <v-icon small color="#CD853F" class="mr-1">mdi-timer-sand</v-icon>
-            {{ item.attack_cooldown }}s
+            {{ item.attackCooldown }}s
           </div>
         </template>
         
-        <!-- Reward Item Stat -->
-        <template v-slot:item.reward_item="{ item }">
+        <!-- Disintegration Time Stat -->
+        <template v-slot:item.disintegrationTime="{ item }">
           <div class="stat-wrapper">
-            <v-icon small color="#FFD700" class="mr-1">mdi-treasure-chest</v-icon>
-            {{ item.reward_item || 'None' }}
+            <v-icon small color="#FFD700" class="mr-1">mdi-skull</v-icon>
+            {{ item.disintegrationTime }}s
           </div>
         </template>
         
@@ -132,7 +132,7 @@
                     <span>Immortal Vitality</span>
                   </div>
                   <v-text-field
-                    v-model="editedBoss.health"
+                    v-model="editedBoss.bossMaxHealth"
                     type="number"
                     outlined
                     dense
@@ -146,7 +146,7 @@
                     <span>Primary Strike Might</span>
                   </div>
                   <v-text-field
-                    v-model="editedBoss.damage"
+                    v-model="editedBoss.attack1Damage"
                     type="number"
                     outlined
                     dense
@@ -160,7 +160,7 @@
                     <span>Arcane Power</span>
                   </div>
                   <v-text-field
-                    v-model="editedBoss.specialAttackDamage"
+                    v-model="editedBoss.attack2Damage"
                     type="number"
                     outlined
                     dense
@@ -174,7 +174,7 @@
                     <span>Swift Movement</span>
                   </div>
                   <v-text-field
-                    v-model="editedBoss.speed"
+                    v-model="editedBoss.moveSpeed"
                     type="number"
                     outlined
                     dense
@@ -231,15 +231,17 @@
                 
                 <div class="form-group">
                   <div class="stat-label">
-                    <v-icon color="#FFD700">mdi-treasure-chest</v-icon>
-                    <span>Treasure Bestowed</span>
+                    <v-icon color="#FFD700">mdi-skull</v-icon>
+                    <span>Disintegration Time</span>
                   </div>
                   <v-text-field
-                    v-model="editedBoss.rewardItem"
+                    v-model="editedBoss.disintegrationTime"
                     type="number"
                     outlined
                     dense
                     class="medieval-input"
+                    hint="Seconds until body fades"
+                    persistent-hint
                   />
                 </div>
               </v-col>
@@ -281,38 +283,38 @@ export default {
   data() {
     return {
       snackbar: {
-      show: false,
-      text: '',
-      color: '',
-      icon: ''
-    },
+        show: false,
+        text: '',
+        color: '',
+        icon: ''
+      },
       bosses: [],
       loading: false,
       headers: [
-        { text: 'ID', value: 'id_boss', align: 'center', width: '70px' },
-        { text: 'LEGEND NAME', value: 'boss_name', align: 'start' },
-        { text: 'VITALITY', value: 'boss_max_health', align: 'center' },
-        { text: 'PRIMARY MIGHT', value: 'attack1_damage', align: 'center' },
-        { text: 'ARCANE POWER', value: 'attack2_damage', align: 'center' },
-        { text: 'SWIFTNESS', value: 'move_speed', align: 'center' },
-        { text: 'REACH', value: 'attack_range', align: 'center' },
-        { text: 'FAR SIGHT', value: 'vision_range', align: 'center' },
-        { text: 'ATTACK DELAY', value: 'attack_cooldown', align: 'center' },
-        { text: 'BOUNTY', value: 'reward_item', align: 'center' },
+        { text: 'ID', value: 'id', align: 'center', width: '70px' },
+        { text: 'LEGEND NAME', value: 'bossName', align: 'start' },
+        { text: 'VITALITY', value: 'bossMaxHealth', align: 'center' },
+        { text: 'PRIMARY MIGHT', value: 'attack1Damage', align: 'center' },
+        { text: 'ARCANE POWER', value: 'attack2Damage', align: 'center' },
+        { text: 'SWIFTNESS', value: 'moveSpeed', align: 'center' },
+        { text: 'REACH', value: 'attackRange', align: 'center' },
+        { text: 'FAR SIGHT', value: 'visionRange', align: 'center' },
+        { text: 'ATTACK DELAY', value: 'attackCooldown', align: 'center' },
+        { text: 'FADE TIME', value: 'disintegrationTime', align: 'center' },
         { text: 'ACTIONS', value: 'actions', align: 'center', sortable: false, width: '80px' }
       ],
       dialogEdit: false,
       editedBoss: {
         id: null,
         name: '',
-        health: 0,
-        damage: 0,
-        speed: 0,
-        specialAttackDamage: 0,
+        bossMaxHealth: 0,
+        attack1Damage: 0,
+        moveSpeed: 0,
+        attack2Damage: 0,
         attackRange: 0,
         visionRange: 0,
         attackCooldown: 0,
-        rewardItem: 0
+        disintegrationTime: 0
       }
     }
   },
@@ -329,7 +331,7 @@ export default {
         console.error('Error loading bosses:', error);
       } finally {
         this.loading = false;
-    }
+      }
     },
     showNotification(text, color, icon) {
       this.snackbar = {
@@ -341,16 +343,16 @@ export default {
     },
     editBoss(item) {
       this.editedBoss = {
-        id: item.id_boss,
-        name: item.boss_name,
-        health: item.boss_max_health,
-        damage: item.attack1_damage,
-        speed: item.move_speed,
-        specialAttackDamage: item.attack2_damage,
-        attackRange: item.attack_range,
-        visionRange: item.vision_range,
-        attackCooldown: item.attack_cooldown,
-        rewardItem: item.reward_item
+        id: item.id,
+        name: item.bossName,
+        bossMaxHealth: item.bossMaxHealth,
+        attack1Damage: item.attack1Damage,
+        moveSpeed: item.moveSpeed,
+        attack2Damage: item.attack2Damage,
+        attackRange: item.attackRange,
+        visionRange: item.visionRange,
+        attackCooldown: item.attackCooldown,
+        disintegrationTime: item.disintegrationTime
       }
       this.dialogEdit = true
     },
@@ -362,14 +364,14 @@ export default {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            boss_max_health: Number(this.editedBoss.health),
-            attack1_damage: Number(this.editedBoss.damage),
-            move_speed: Number(this.editedBoss.speed),
-            attack2_damage: Number(this.editedBoss.specialAttackDamage),
-            attack_range: Number(this.editedBoss.attackRange),
-            vision_range: Number(this.editedBoss.visionRange),
-            attack_cooldown: Number(this.editedBoss.attackCooldown),
-            reward_item: Number(this.editedBoss.rewardItem) || null
+            bossMaxHealth: Number(this.editedBoss.bossMaxHealth),
+            attack1Damage: Number(this.editedBoss.attack1Damage),
+            moveSpeed: Number(this.editedBoss.moveSpeed),
+            attack2Damage: Number(this.editedBoss.attack2Damage),
+            attackRange: Number(this.editedBoss.attackRange),
+            visionRange: Number(this.editedBoss.visionRange),
+            attackCooldown: Number(this.editedBoss.attackCooldown),
+            disintegrationTime: Number(this.editedBoss.disintegrationTime)
           })
         })
         if (!response.ok) throw new Error('Error updating boss');
@@ -386,14 +388,14 @@ export default {
       this.editedBoss = {
         id: null,
         name: '',
-        health: 0,
-        damage: 0,
-        speed: 0,
-        specialAttackDamage: 0,
+        bossMaxHealth: 0,
+        attack1Damage: 0,
+        moveSpeed: 0,
+        attack2Damage: 0,
         attackRange: 0,
         visionRange: 0,
         attackCooldown: 0,
-        rewardItem: 0
+        disintegrationTime: 0
       }
     }
   },

@@ -2,57 +2,44 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Boss = sequelize.define('Boss', {
-  id_boss: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  boss_name: {
-    type: DataTypes.STRING(50),
+  bossName: {
+    type: DataTypes.STRING,
     allowNull: false
   },
-  boss_max_health: {
+  bossMaxHealth: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  move_speed: {
+  moveSpeed: {
     type: DataTypes.FLOAT,
     allowNull: false
   },
-  attack_range: {
+  attackRange: {
     type: DataTypes.FLOAT,
     allowNull: false
   },
-  attack_cooldown: {
+  attackCooldown: {
     type: DataTypes.FLOAT,
     allowNull: false
   },
-  attack1_damage: {
+  attack1Damage: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  attack2_damage: {
+  attack2Damage: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  vision_range: {
+  visionRange: {
     type: DataTypes.FLOAT,
     allowNull: false
   },
-  reward_item: {
-    type: DataTypes.INTEGER
+  disintegrationTime: {
+    type: DataTypes.FLOAT,
+    allowNull: false
   }
 }, {
-  tableName: 'boss',
   timestamps: false
 });
-
-// Define associations (solo si hay otras)
-Boss.associate = (models) => {
-  Boss.belongsTo(models.Item, {
-    foreignKey: 'reward_item',
-    onDelete: 'SET NULL'
-  });
-};
 
 module.exports = Boss;

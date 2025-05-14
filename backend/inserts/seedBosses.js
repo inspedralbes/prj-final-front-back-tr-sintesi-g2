@@ -3,48 +3,48 @@ const Boss = require('../models/Boss');
 const seedBosses = async () => {
   const bosses = [
     {
-      boss_name: 'Dragón Infernal',
-      boss_max_health: 5000,
-      move_speed: 1.2,
-      attack_range: 5.0,
-      attack_cooldown: 2.5,
-      attack1_damage: 150,
-      attack2_damage: 300,
-      vision_range: 10.0,
-      reward_item: 8 // ID del ítem: Llave Dragón
+      bossName: 'The Witch',
+      bossMaxHealth: 5000,
+      moveSpeed: 1.2,
+      attackRange: 5.0,
+      attackCooldown: 2.5,
+      attack1Damage: 150,
+      attack2Damage: 300,
+      visionRange: 10.0,
+      disintegrationTime: 2.5
     },
     {
-      boss_name: 'Rey Esqueleto',
-      boss_max_health: 3500,
-      move_speed: 1.0,
-      attack_range: 3.0,
-      attack_cooldown: 3.0,
-      attack1_damage: 100,
-      attack2_damage: 200,
-      vision_range: 8.0,
-      reward_item: 6 // ID del ítem: Llave Esqueleto
+      bossName: 'Jefe Oscuro',
+      bossMaxHealth: 3500,
+      moveSpeed: 1.0,
+      attackRange: 3.0,
+      attackCooldown: 3.0,
+      attack1Damage: 100,
+      attack2Damage: 200,
+      visionRange: 8.0,
+      disintegrationTime: 2.0
     },
     {
-      boss_name: 'Lobo Alfa',
-      boss_max_health: 2500,
-      move_speed: 1.8,
-      attack_range: 2.0,
-      attack_cooldown: 1.8,
-      attack1_damage: 80,
-      attack2_damage: 150,
-      vision_range: 7.5,
-      reward_item: 7 // ID del ítem: Llave Lobo
+      bossName: 'mago fuego',
+      bossMaxHealth: 2500,
+      moveSpeed: 1.8,
+      attackRange: 2.0,
+      attackCooldown: 1.8,
+      attack1Damage: 80,
+      attack2Damage: 150,
+      visionRange: 7.5,
+      disintegrationTime: 1.8
     },
     {
-      boss_name: 'Hechicero del Abismo',
-      boss_max_health: 4000,
-      move_speed: 0.9,
-      attack_range: 6.0,
-      attack_cooldown: 2.0,
-      attack1_damage: 120,
-      attack2_damage: 220,
-      vision_range: 12.0,
-      reward_item: 5 // ID del ítem: Llave Dorada
+      bossName: 'Hechicero del Abismo',
+      bossMaxHealth: 4000,
+      moveSpeed: 0.9,
+      attackRange: 6.0,
+      attackCooldown: 2.0,
+      attack1Damage: 120,
+      attack2Damage: 220,
+      visionRange: 12.0,
+      disintegrationTime: 2.2
     }
   ];
 
