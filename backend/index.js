@@ -47,7 +47,7 @@ require('dotenv').config({ path: './environment/.env' });
     //await seedGames(); // 👈 esto inserta los juegos en la DB
     //await seedPlayers(); // 👈 esto inserta los jugadores en la DB
     //await seedEnemies(); // 👈 esto inserta los enemigos en la DB
-    await seedBosses(); // 👈 esto inserta los jefes en la DB
+    //await seedBosses(); // 👈 esto inserta los jefes en la DB
     //await seedInventory(); // 👈 esto inserta los inventarios en la DB
     //await seedShop(); // 👈 esto inserta los tiendas en la DB
     //await seedEnemyDeathStats(); // 👈 esto inserta las estadísticas de muertes en la DB

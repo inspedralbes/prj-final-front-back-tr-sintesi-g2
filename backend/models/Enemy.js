@@ -37,13 +37,15 @@ const Enemy = sequelize.define('Enemy', {
   },
   second_attack_damage: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: true
   },
   block_chance: {
-    type: DataTypes.FLOAT
+    type: DataTypes.FLOAT,
+    allowNull: true
   },
   reduced_damage: {
-    type: DataTypes.INTEGER
+    type: DataTypes.INTEGER,
+    allowNull: true
   },
   attack_cooldown: {
     type: DataTypes.FLOAT,
