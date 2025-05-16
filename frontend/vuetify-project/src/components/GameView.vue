@@ -86,8 +86,7 @@
   <span class="btn-text">GO TO LOGIN</span>
 </v-btn>
 <v-btn
-  class="mt-4"
-  color="primary"
+  class="login-btn"
   @click="downloadJuegoZip"
 >
   <v-icon left>mdi-download</v-icon>
