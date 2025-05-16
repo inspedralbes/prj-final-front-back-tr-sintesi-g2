@@ -82,9 +82,18 @@
   @click="goToLogin"
   elevation="2"
 >
-  <v-icon left>mdi-login</v-icon>
+<v-icon left>mdi-login</v-icon>
   <span class="btn-text">GO TO LOGIN</span>
 </v-btn>
+<v-btn
+  class="mt-4"
+  color="primary"
+  @click="downloadJuegoZip"
+>
+  <v-icon left>mdi-download</v-icon>
+  <span>Download juegoCo</span>
+</v-btn>
+
 
 </div>
 </template>
@@ -125,6 +134,25 @@ document.addEventListener("keydown", this.handleCustomFullscreenExit);
   document.removeEventListener("fullscreenchange", this.onFullscreenChange);
   },
   methods: {
+    async downloadJuegoZip() {
+    try {
+      const response = await fetch('https://thelastknightofaveron.cat/download-juego');
+
+      if (!response.ok) throw new Error('Error downloading file');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'juegoCo.zip';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error downloading file:', err);
+    }
+  },
     goToLogin() {
       this.$router.push('/login');
     },

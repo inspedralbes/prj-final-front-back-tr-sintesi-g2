@@ -21,6 +21,8 @@ const { startBossService } = require('./routes/bossRoutes');
 const { startShopService } = require('./routes/shopRoutes');
 const { startItemService } = require('./routes/itemRoutes');
 const { startEnemyDeathStatService } = require('./routes/enemyDeathStatRoutes');
+const { startDownloadService } = require('./routes/downloadRoute');
+
 
 require('./routes/serviceController');
 
@@ -37,6 +39,7 @@ require('dotenv').config({ path: './environment/.env' });
     //startGameService();
     //startInventoryService();
     startUserService();
+    startDownloadService(); // 👈 Este lanza el microservicio en 3015
     //startEnemyDeathStatService();
     //startEnemyService();
     //startBossService();
