@@ -347,14 +347,16 @@ export default {
           value: 'actions'
         }
       ],
-      serviceApiUrl: process.env.VUE_APP_SERVICE_CONTROL_API || 'http://localhost:3000',
+      serviceApiUrl: '/services',
       socket: null
     }
   },
   mounted() {
     // Verificar el estado de los servicios al cargar el componente
     this.refreshServices();
-    this.socket = io(this.serviceApiUrl);
+    this.socket = io("/");
+    console.log("Socket connected to ", this.serviceApiUrl);
+    console.log("Socket connected to ", io);
 
     // Recibir el estado inicial de todos los servicios
     this.socket.on("all-services-status", (services) => {
