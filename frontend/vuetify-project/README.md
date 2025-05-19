@@ -1,79 +1,103 @@
-# Vuetify (Default)
+ExportPublish🎮 Frontend - TheLastKnightOfAveron
+Este directorio contiene el cliente/administración web del proyecto TheLastKnightOfAveron, desarrollado con Vue.js.
 
-This is the official scaffolding tool for Vuetify, designed to give you a head start in building your new Vuetify application. It sets up a base template with all the necessary configurations and standard directory structure, enabling you to begin development without the hassle of setting up the project from scratch.
+📂 Estructura del Frontend
+frontend/
+├── public/
+│   ├── build/                   # Archivos compilados del juego
+│   │   ├── juego.data.br        # Datos comprimidos del juego
+│   │   ├── juego.framework.js.br # Framework del juego comprimido
+│   │   ├── juego.loader.js      # Cargador del juego 
+│   │   └── juego.wasm.br        # Binario WebAssembly comprimido
+│   ├── favicon.ico              # Favicon del sitio
+│   └── icon.png                 # Ícono principal
+│
+├── src/
+│   ├── assets/                  # Recursos estáticos (imágenes, fonts, etc.)
+│   ├── components/              # Componentes Vue reutilizables
+│   │   └── dashboard/           # Componentes para gestión de tablas, solo para admins
+│   │       ├── BossManagement.vue       # Gestión de jefes
+│   │       ├── EnemyDeathStats.vue      # Estadísticas de enemigos
+│   │       ├── EnemyManagement.vue      # Gestión de enemigos
+│   │       ├── GameManagement.vue       # Gestión de partidas
+│   │       ├── ItemManagement.vue       # Gestión de ítems/objetos
+│   │       ├── PlayerManagement.vue     # Gestión de jugadores
+│   │       ├── ShopManagement.vue       # Gestión de tienda
+│   │       ├── Dashboard.vue            # Vista principal del panel de control
+│   │       ├── GameView.vue             # Componente para ejecutar el juego Unity WebGL
+│   │       ├── login.vue                # Componente de inicio de sesión
+│   │       └── register.vue             # Componente de registro
+│   ├── pages/                   # Páginas principales de la aplicación
+│   ├── plugins/                 # Plugins de Vue.js
+│   ├── router/                  # Configuración de rutas
+│   │   └── index.js             # Definición de rutas principales
+│   ├── styles/                  # Estilos globales CSS/SCSS
+│   └── views/                   # Vistas principales
+│       ├── LoginView.vue        # Vista de inicio de sesión
+│       ├── RegisterView.vue     # Vista de registro
+│       └── App.vue              # Componente raíz
+│
+└── README.md                    # Este archivo
 
-## ❗️ Important Links
+🎯 Componentes Principales
+🎲 GameView.vue
+Este componente es el encargado de cargar y mostrar el juego desarrollado en Unity utilizando WebGL. Permite a los usuarios interactuar directamente con el juego desde el navegador sin necesidad de instalaciones adicionales.
+Características:
 
-- 📄 [Docs](https://vuetifyjs.com/)
-- 🚨 [Issues](https://issues.vuetifyjs.com/)
-- 🏬 [Store](https://store.vuetifyjs.com/)
-- 🎮 [Playground](https://play.vuetifyjs.com/)
-- 💬 [Discord](https://community.vuetifyjs.com)
+Carga los archivos necesarios del juego desde la carpeta /public/build/
+Gestiona la comunicación entre el juego y la aplicación web
+Adapta el tamaño del canvas para diferentes dispositivos
+Maneja estados de carga y posibles errores
+Contiene un sistema de microservicios donde puedes apagar y encender todos los microservicios
 
-## 💿 Install
+📊 Dashboard
+El directorio dashboard contiene todos los componentes relacionados con la administración y gestión del juego:
 
-Set up your project using your preferred package manager. Use the corresponding command to install the dependencies:
+Dashboard.vue: Panel principal que organiza y da acceso a los diferentes módulos de gestión
+BossManagement.vue: Administración de jefes
+EnemyManagement.vue: Administración de enemigos
+EnemyDeathStats.vue: Visualización de estadísticas sobre muertes de enemigos
+GameManagement.vue: Configuración general del juego
+ItemManagement.vue: Gestión de ítems y objetos coleccionables
+PlayerManagement.vue: Administración de perfiles de jugadores
+ShopManagement.vue: Gestión de la tienda virtual del juego
 
-| Package Manager                                                | Command        |
-|---------------------------------------------------------------|----------------|
-| [yarn](https://yarnpkg.com/getting-started)                   | `yarn install` |
-| [npm](https://docs.npmjs.com/cli/v7/commands/npm-install)     | `npm install`  |
-| [pnpm](https://pnpm.io/installation)                          | `pnpm install` |
-| [bun](https://bun.sh/#getting-started)                        | `bun install`  |
+Cada componente de gestión permite realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre su respectiva entidad en la base de datos.
+🔒 Autenticación
 
-After completing the installation, your environment is ready for Vuetify development.
+login.vue: Maneja el proceso de autenticación de usuarios
+register.vue: Gestiona el registro de nuevos usuarios
 
-## ✨ Features
+🚀 Cómo ejecutar el frontend
 
-- 🖼️ **Optimized Front-End Stack**: Leverage the latest Vue 3 and Vuetify 3 for a modern, reactive UI development experience. [Vue 3](https://v3.vuejs.org/) | [Vuetify 3](https://vuetifyjs.com/en/)
-- 🗃️ **State Management**: Integrated with [Pinia](https://pinia.vuejs.org/), the intuitive, modular state management solution for Vue.
-- 🚦 **Routing and Layouts**: Utilizes Vue Router for SPA navigation and vite-plugin-vue-layouts for organizing Vue file layouts. [Vue Router](https://router.vuejs.org/) | [vite-plugin-vue-layouts](https://github.com/JohnCampionJr/vite-plugin-vue-layouts)
-- ⚡ **Next-Gen Tooling**: Powered by Vite, experience fast cold starts and instant HMR (Hot Module Replacement). [Vite](https://vitejs.dev/)
-- 🧩 **Automated Component Importing**: Streamline your workflow with unplugin-vue-components, automatically importing components as you use them. [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components)
+Instalar dependencias:
 
-These features are curated to provide a seamless development experience from setup to deployment, ensuring that your Vuetify application is both powerful and maintainable.
+bashnpm install
 
-## 💡 Usage
+Ejecutar en modo desarrollo:
 
-This section covers how to start the development server and build your project for production.
+bashnpm run dev
 
-### Starting the Development Server
+Compilar para producción:
 
-To start the development server with hot-reload, run the following command. The server will be accessible at [http://localhost:3000](http://localhost:3000):
+bashnpm run build
+🔌 Integración con Unity WebGL
+El juego desarrollado en Unity se exporta como WebGL y se integra en la aplicación mediante los archivos ubicados en /public/build/:
 
-```bash
-yarn dev
-```
+juego.data.br: Contiene los assets y recursos del juego comprimidos
+juego.framework.js.br: Framework JavaScript necesario para la ejecución
+juego.loader.js: Script encargado de cargar el juego en el navegador
+juego.wasm.br: Código compilado a WebAssembly para una ejecución eficiente
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+El componente GameView.vue está configurado específicamente para trabajar con estos archivos y presentar el juego embebido en la aplicación web.
+✅ Requisitos del sistema
 
-> Add NODE_OPTIONS='--no-warnings' to suppress the JSON import warnings that happen as part of the Vuetify import mapping. If you are on Node [v21.3.0](https://nodejs.org/en/blog/release/v21.3.0) or higher, you can change this to NODE_OPTIONS='--disable-warning=5401'. If you don't mind the warning, you can remove this from your package.json dev script.
+Navegador moderno con soporte para WebGL 2.0
+Conexión a internet estable
+Resolución de pantalla mínima recomendada: 1920x1080
 
-### Building for Production
+📝 Notas adicionales
 
-To build your project for production, use:
-
-```bash
-yarn build
-```
-
-(Repeat for npm, pnpm, and bun with respective commands.)
-
-Once the build process is completed, your application will be ready for deployment in a production environment.
-
-## 💪 Support Vuetify Development
-
-This project is built with [Vuetify](https://vuetifyjs.com/en/), a UI Library with a comprehensive collection of Vue components. Vuetify is an MIT licensed Open Source project that has been made possible due to the generous contributions by our [sponsors and backers](https://vuetifyjs.com/introduction/sponsors-and-backers/). If you are interested in supporting this project, please consider:
-
-- [Requesting Enterprise Support](https://support.vuetifyjs.com/)
-- [Sponsoring John on Github](https://github.com/users/johnleider/sponsorship)
-- [Sponsoring Kael on Github](https://github.com/users/kaelwd/sponsorship)
-- [Supporting the team on Open Collective](https://opencollective.com/vuetify)
-- [Becoming a sponsor on Patreon](https://www.patreon.com/vuetify)
-- [Becoming a subscriber on Tidelift](https://tidelift.com/subscription/npm/vuetify)
-- [Making a one-time donation with Paypal](https://paypal.me/vuetify)
-
-## 📑 License
-[MIT](http://opensource.org/licenses/MIT)
-
-Copyright (c) 2016-present Vuetify, LLC
+La comunicación entre el frontend y el backend se realiza mediante peticiones HTTP a la API REST
+Se recomienda utilizar Chrome o Firefox para una mejor experiencia con WebGL
+El panel de administración requiere autenticación con credenciales de administrador
