@@ -20,7 +20,7 @@ router.post('/createInventory', async (req, res) => {
         return await Inventory.create({
           player_id,
           id_item: item_id,
-          quantity: 1
+          quantity: 3
         });
       })
     );
