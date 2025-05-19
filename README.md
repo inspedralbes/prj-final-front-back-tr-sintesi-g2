@@ -1,6 +1,7 @@
 # 🎮 TheLastKnightOfAveron
 
-**TheLastKnightOfAveron** es una aplicación web completa con un backend robusto y un frontend desarrollado en Vue.js que ya está en producción.
+**TheLastKnightOfAveron** es un videojuego 2D estilo roguelike con arte pixelado, inspirado en títulos como Blasphemous. Ambientado en el misterioso y oscuro reino de Averon —una reinterpretación fantástica de Barcelona medieval—, encarnarás al último caballero con la misión de derrotar enemigos y jefes desafiantes a lo largo de distintos niveles, desentrañando una historia marcada por antiguas leyendas, sacrificios y redención.
+
 
 ## 🧑‍💻 Integrantes del Proyecto
 
@@ -13,11 +14,10 @@
 ## 📖 Descripción del Proyecto
 
 *TheLastKnightOfAveron* es una plataforma web donde:
-
-- Los usuarios pueden explorar el mundo de Averon y sus leyendas  
-- Incluye un sistema de autenticación y gestión de perfiles personalizados  
-- Permite la interacción entre usuarios mediante un sistema de mensajería  
-- Cuenta con una interfaz intuitiva y responsiva diseñada para una experiencia inmersiva  
+-Los usuarios pueden explorar el lore y las leyendas del mundo de Averon.
+-Se ofrece un sistema de tienda y gestion de skins.
+-Los jugadores pueden unirse a otros para entrar en un torreon y enfrentarse a bosses.
+-Todo está integrado en una interfaz intuitiva, responsiva y diseñada para ofrecer una experiencia inmersiva tanto dentro como fuera del juego.
 
 ## 🧠 Estructura General del Proyecto
 
