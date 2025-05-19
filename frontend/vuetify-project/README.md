@@ -1,103 +1,126 @@
-ExportPublish🎮 Frontend - TheLastKnightOfAveron
-Este directorio contiene el cliente/administración web del proyecto TheLastKnightOfAveron, desarrollado con Vue.js.
+## 🎮 Frontend - TheLastKnightOfAveron
 
-📂 Estructura del Frontend
+Este directorio contiene el cliente/administración web del proyecto **TheLastKnightOfAveron**, desarrollado con **Vue.js**.
+
+---
+
+## 📂 Estructura del Frontend
+
+```bash
 frontend/
 ├── public/
-│   ├── build/                   # Archivos compilados del juego
-│   │   ├── juego.data.br        # Datos comprimidos del juego
-│   │   ├── juego.framework.js.br # Framework del juego comprimido
-│   │   ├── juego.loader.js      # Cargador del juego 
-│   │   └── juego.wasm.br        # Binario WebAssembly comprimido
-│   ├── favicon.ico              # Favicon del sitio
-│   └── icon.png                 # Ícono principal
+│   ├── build/                        # Archivos compilados del juego
+│   │   ├── juego.data.br             # Datos comprimidos del juego
+│   │   ├── juego.framework.js.br     # Framework del juego comprimido
+│   │   ├── juego.loader.js           # Cargador del juego
+│   │   └── juego.wasm.br             # Binario WebAssembly comprimido
+│   ├── favicon.ico                   # Favicon del sitio
+│   └── icon.png                      # Ícono principal
 │
 ├── src/
-│   ├── assets/                  # Recursos estáticos (imágenes, fonts, etc.)
-│   ├── components/              # Componentes Vue reutilizables
-│   │   └── dashboard/           # Componentes para gestión de tablas, solo para admins
-│   │       ├── BossManagement.vue       # Gestión de jefes
-│   │       ├── EnemyDeathStats.vue      # Estadísticas de enemigos
-│   │       ├── EnemyManagement.vue      # Gestión de enemigos
-│   │       ├── GameManagement.vue       # Gestión de partidas
-│   │       ├── ItemManagement.vue       # Gestión de ítems/objetos
-│   │       ├── PlayerManagement.vue     # Gestión de jugadores
-│   │       ├── ShopManagement.vue       # Gestión de tienda
-│   │       ├── Dashboard.vue            # Vista principal del panel de control
-│   │       ├── GameView.vue             # Componente para ejecutar el juego Unity WebGL
-│   │       ├── login.vue                # Componente de inicio de sesión
-│   │       └── register.vue             # Componente de registro
-│   ├── pages/                   # Páginas principales de la aplicación
-│   ├── plugins/                 # Plugins de Vue.js
-│   ├── router/                  # Configuración de rutas
-│   │   └── index.js             # Definición de rutas principales
-│   ├── styles/                  # Estilos globales CSS/SCSS
-│   └── views/                   # Vistas principales
-│       ├── LoginView.vue        # Vista de inicio de sesión
-│       ├── RegisterView.vue     # Vista de registro
-│       └── App.vue              # Componente raíz
+│   ├── assets/                       # Recursos estáticos (imágenes, fuentes, etc.)
+│   ├── components/                   # Componentes Vue reutilizables
+│   │   └── dashboard/                # Panel de administración (solo admins)
+│   │       ├── BossManagement.vue
+│   │       ├── EnemyDeathStats.vue
+│   │       ├── EnemyManagement.vue
+│   │       ├── GameManagement.vue
+│   │       ├── ItemManagement.vue
+│   │       ├── PlayerManagement.vue
+│   │       ├── ShopManagement.vue
+│   │       ├── Dashboard.vue
+│   │       ├── GameView.vue
+│   │       ├── login.vue
+│   │       └── register.vue
+│   ├── pages/                        # Páginas principales
+│   ├── plugins/                      # Plugins de Vue.js
+│   ├── router/
+│   │   └── index.js                  # Rutas principales
+│   ├── styles/                       # Estilos globales
+│   └── views/
+│       ├── LoginView.vue
+│       ├── RegisterView.vue
+│       └── App.vue                  # Componente raíz
 │
-└── README.md                    # Este archivo
+└── README.md
 
-🎯 Componentes Principales
-🎲 GameView.vue
-Este componente es el encargado de cargar y mostrar el juego desarrollado en Unity utilizando WebGL. Permite a los usuarios interactuar directamente con el juego desde el navegador sin necesidad de instalaciones adicionales.
-Características:
+```
 
-Carga los archivos necesarios del juego desde la carpeta /public/build/
-Gestiona la comunicación entre el juego y la aplicación web
-Adapta el tamaño del canvas para diferentes dispositivos
-Maneja estados de carga y posibles errores
-Contiene un sistema de microservicios donde puedes apagar y encender todos los microservicios
+## 🎯 Componentes Principales
 
-📊 Dashboard
-El directorio dashboard contiene todos los componentes relacionados con la administración y gestión del juego:
+### 🎲 `GameView.vue`
 
-Dashboard.vue: Panel principal que organiza y da acceso a los diferentes módulos de gestión
-BossManagement.vue: Administración de jefes
-EnemyManagement.vue: Administración de enemigos
-EnemyDeathStats.vue: Visualización de estadísticas sobre muertes de enemigos
-GameManagement.vue: Configuración general del juego
-ItemManagement.vue: Gestión de ítems y objetos coleccionables
-PlayerManagement.vue: Administración de perfiles de jugadores
-ShopManagement.vue: Gestión de la tienda virtual del juego
+Este componente carga y muestra el juego exportado en Unity (WebGL), permitiendo a los usuarios jugar directamente desde el navegador sin necesidad de instalaciones.
 
-Cada componente de gestión permite realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre su respectiva entidad en la base de datos.
-🔒 Autenticación
+**Características:**
 
-login.vue: Maneja el proceso de autenticación de usuarios
-register.vue: Gestiona el registro de nuevos usuarios
+- Carga automática de archivos desde `/public/build/`
+- Comunicación entre juego y aplicación web
+- Adaptación del canvas a distintos tamaños de pantalla
+- Manejo de estados de carga y errores
+- Control de microservicios: puedes apagar o encenderlos desde la interfaz
 
-🚀 Cómo ejecutar el frontend
+---
 
-Instalar dependencias:
+## 📊 Dashboard
 
-bashnpm install
+El directorio `dashboard/` contiene todos los componentes para la administración del juego. Cada uno permite realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre una entidad del sistema:
 
-Ejecutar en modo desarrollo:
+- `Dashboard.vue`: Vista principal del panel
+- `BossManagement.vue`: Gestión de jefes
+- `EnemyManagement.vue`: Gestión de enemigos
+- `EnemyDeathStats.vue`: Estadísticas de muertes
+- `GameManagement.vue`: Configuración del juego
+- `ItemManagement.vue`: Gestión de ítems
+- `PlayerManagement.vue`: Gestión de jugadores
+- `ShopManagement.vue`: Administración de la tienda virtual
 
-bashnpm run dev
+---
 
-Compilar para producción:
+## 🔒 Autenticación
 
-bashnpm run build
-🔌 Integración con Unity WebGL
-El juego desarrollado en Unity se exporta como WebGL y se integra en la aplicación mediante los archivos ubicados en /public/build/:
+- `login.vue`: Componente de inicio de sesión
+- `register.vue`: Componente de registro de usuarios
 
-juego.data.br: Contiene los assets y recursos del juego comprimidos
-juego.framework.js.br: Framework JavaScript necesario para la ejecución
-juego.loader.js: Script encargado de cargar el juego en el navegador
-juego.wasm.br: Código compilado a WebAssembly para una ejecución eficiente
+---
 
-El componente GameView.vue está configurado específicamente para trabajar con estos archivos y presentar el juego embebido en la aplicación web.
-✅ Requisitos del sistema
+## 🚀 Cómo ejecutar el frontend
 
-Navegador moderno con soporte para WebGL 2.0
+### Instalar dependencias:
+
+npm install
+
+## Ejecutar en modo desarrollo:
+
+npm run dev
+
+## Compilar para producción:
+
+npm run build
+
+## 🔌 Integración con Unity WebGL
+El juego desarrollado en Unity se exporta a WebGL y se integra mediante los siguientes archivos en /public/build/:
+
+juego.data.br: Assets y datos comprimidos
+
+juego.framework.js.br: Framework para ejecutar Unity
+
+juego.loader.js: Script de carga
+
+juego.wasm.br: Código WebAssembly optimizado
+
+El componente GameView.vue está diseñado para usar estos archivos y renderizar el juego dentro del navegador.
+
+## ✅ Requisitos del Sistema
+Navegador moderno con soporte WebGL 2.0
+
 Conexión a internet estable
-Resolución de pantalla mínima recomendada: 1920x1080
 
-📝 Notas adicionales
+Resolución mínima recomendada: 1920x1080
 
-La comunicación entre el frontend y el backend se realiza mediante peticiones HTTP a la API REST
-Se recomienda utilizar Chrome o Firefox para una mejor experiencia con WebGL
-El panel de administración requiere autenticación con credenciales de administrador
+📝 Notas Adicionales
+La comunicación entre frontend y backend se realiza mediante API REST
+
+Se recomienda usar Chrome o Firefox para mejor rendimiento con WebGL
+
+El acceso al panel de administración requiere credenciales de administrador
