@@ -14,10 +14,12 @@
 ## 📖 Descripción del Proyecto
 
 *TheLastKnightOfAveron* es una plataforma web donde:
--Los usuarios pueden explorar el lore y las leyendas del mundo de Averon.
--Se ofrece un sistema de tienda y gestion de skins.
--Los jugadores pueden unirse a otros para entrar en un torreon y enfrentarse a bosses.
--Todo está integrado en una interfaz intuitiva, responsiva y diseñada para ofrecer una experiencia inmersiva tanto dentro como fuera del juego.
+
+- Los usuarios pueden explorar el lore y las leyendas del mundo de Averon.  
+- Se ofrece un sistema de tienda y gestión de skins.  
+- Los jugadores pueden unirse a otros para entrar en un torreón y enfrentarse a bosses.  
+- Todo está integrado en una interfaz intuitiva, responsiva y diseñada para ofrecer una experiencia inmersiva tanto dentro como fuera del juego.
+
 
 ## 🧠 Estructura General del Proyecto
 
