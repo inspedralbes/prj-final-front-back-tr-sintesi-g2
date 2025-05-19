@@ -118,7 +118,7 @@ Conexión a internet estable
 
 Resolución mínima recomendada: 1920x1080
 
-📝 Notas Adicionales
+## 📝 Notas Adicionales
 La comunicación entre frontend y backend se realiza mediante API REST
 
 Se recomienda usar Chrome o Firefox para mejor rendimiento con WebGL
