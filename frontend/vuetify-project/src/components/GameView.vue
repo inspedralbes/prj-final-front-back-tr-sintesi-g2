@@ -85,7 +85,13 @@
   <v-icon left>mdi-login</v-icon>
   <span class="btn-text">GO TO LOGIN</span>
 </v-btn>
-
+<v-btn
+  class="login-btn"
+  @click="downloadJuegoZip"
+>
+  <v-icon left>mdi-download</v-icon>
+  <span>Download juegoCo</span>
+</v-btn>
 </div>
 </template>
 
