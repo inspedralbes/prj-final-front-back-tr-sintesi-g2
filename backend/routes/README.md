@@ -100,6 +100,7 @@ async function startService(serviceType) {
   io.emit('service-status-changed', newStatus); // Emitir cambio de estado
   return newStatus;
 }
+```
 ## ✅ Ventajas del Modelo
 🔄 Modularidad: Cada funcionalidad es aislada y autocontenida.
 
