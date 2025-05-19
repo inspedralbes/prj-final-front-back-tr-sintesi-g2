@@ -1,7 +1,7 @@
 # 🎮 TheLastKnightOfAveron
 
-**TheLastKnightOfAveron** es un videojuego 2D estilo roguelike con arte pixelado, inspirado en títulos como Blasphemous. Ambientado en el misterioso y oscuro reino de Averon —una reinterpretación fantástica de Barcelona medieval—, encarnarás al último caballero con la misión de derrotar enemigos y jefes desafiantes a lo largo de distintos niveles, desentrañando una historia marcada por antiguas leyendas, sacrificios y redención.
-
+**TheLastKnightOfAveron** es un videojuego 2D estilo roguelike con arte pixelado, inspirado en títulos como Blasphemous. 
+Ambientado en el misterioso y oscuro reino de Averon —una reinterpretación fantástica de Barcelona medieval—, encarnarás al último caballero con la misión de derrotar enemigos y jefes desafiantes a lo largo de distintos niveles, desentrañando una historia marcada por antiguas leyendas, sacrificios y redención.
 
 ## 🧑‍💻 Integrantes del Proyecto
 
@@ -22,7 +22,7 @@
 
 
 ## 🧠 Estructura General del Proyecto
-
+```bash
 TheLastKnightOfAveron/
 ├── backend/ # API y lógica del servidor
 │ ├── config/ # Configuraciones del servidor
@@ -39,15 +39,12 @@ TheLastKnightOfAveron/
 │ └── vite.config.mjs# Configuración de Vite
 ├── doc/ # Documentación adicional
 └── docker/ # Configuración de Docker
-
-markdown
-Copia
-Modifica
+```
 
 ## 🛠️ Tecnologías Utilizadas
 
-- **Backend**: Node.js, Express  
-- **Frontend**: Vue.js, Vite  
+- **Backend**: Node.js, Express  [README Back](backend/README.md)
+- **Frontend**: Vue.js, Vite  [README Front](frontend/vuetify-project/README.md)
 - **Base de datos**: MySQL  
 - **Despliegue**: Docker  
 
@@ -69,6 +66,7 @@ npm run build   # Compilar para producción
 
 ### 🔗 Enlaces del Proyecto
 ### 🌐 Sitio web: URL de la aplicación en producción (https://thelastknightofaveron.cat/)
+
 
 🚀 Estado Actual
 El proyecto ya está en producción. Se encuentra en una fase estable y listo para ser utilizado.
