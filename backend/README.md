@@ -11,7 +11,8 @@ El sistema está organizado como una API REST completa que gestiona todos los as
 - 🔐 **Autenticación**: Sistema seguro para registro e inicio de sesión de usuarios  
 - 📊 **Persistencia**: Almacenamiento de datos del juego en base de datos relacional mediante Sequelize  
 - 🖼️ **Recursos**: Gestión de imágenes y recursos visuales del juego  
-- 📈 **Estadísticas**: Generación y almacenamiento de estadísticas de juego  
+- 📈 **Estadísticas**: Generación y almacenamiento de estadísticas de juego
+- **Documentacion:** [rutas/microservicios](routes/README.md) 
 
 ---
 
@@ -24,7 +25,7 @@ backend/
 ├── imagenes/         # Recursos gráficos (skins, llaves, items)
 ├── inserts/          # Scripts para inserción automática en tablas
 ├── models/           # Modelos Sequelize de las tablas
-├── routes/           # Definición de endpoints API
+├── routes/           # Definición de endpoints API 
 ├── scripts/          # Scripts de Python para generación de gráficos
 ├── stat_images/      # Imágenes de estadísticas generadas
 └── index.js          # Punto de entrada del servidor
@@ -145,11 +146,11 @@ El servidor responde con datos estructurados en formato JSON
 📋 pandas
 
 ## 🚀 Puesta en Marcha
-Instalación de dependencias:
+### Instalación de dependencias:
 npm install
-Configuración de entorno:
+### Configuración de entorno:
 cp environment/.env.example environment/.env
-Ejecución en desarrollo:
+### Ejecución en desarrollo:
 npm run dev
-Ejecución en producción:
+### Ejecución en producción:
 npm start
