@@ -13,8 +13,9 @@ router.post('/newGame', async (req, res) => {
     time_played = 0,
     position_x = 0,
     position_y = 0,
-    health = 100,
-    coins = 0
+    health = 70, // Cambiado a 70 por default según modelo
+    coins = 0,
+    level = 'MAPA TUTORIALL' // Añadido level con default
   } = req.body;
 
   if (!nickname || !game_name) {
@@ -70,7 +71,8 @@ router.post('/newGame', async (req, res) => {
         position_x,
         position_y,
         health,
-        coins
+        coins,
+        level // Añadido level
       });
 
       res.status(201).json({ message: 'Partida creada con éxito.' });
@@ -83,6 +85,7 @@ router.post('/newGame', async (req, res) => {
     res.status(500).send('Error al crear la partida.');
   }
 });
+
 router.get('/game', async (req, res) => {
   try {
     const games = await Game.findAll({
@@ -106,7 +109,12 @@ router.get('/game', async (req, res) => {
       score: parseFloat(game.total_progress),
       time: game.time_played,
       status: game.game_status,
-      createdAt: game.last_save_date
+      createdAt: game.last_save_date,
+      level: game.level, // Agregado level
+      position_x: game.position_x,
+      position_y: game.position_y,
+      health: game.health,
+      coins: game.coins
     }));
 
     res.status(200).json(mappedGames);
@@ -186,6 +194,7 @@ router.get('/lastGame/:nickname', async (req, res) => {
         position_y: game.position_y,
         health: game.health,
         coins: game.coins,
+        level: game.level, // Agregado level
         inventory_id: game.Inventory.id_inventory
       }
     });
@@ -242,7 +251,8 @@ router.put('/updateGame/:nickname', async (req, res) => {
     position_x,
     position_y,
     health,
-    coins
+    coins,
+    level // Añadido level
   } = req.body;
 
   if (!nickname) {
@@ -274,6 +284,7 @@ router.put('/updateGame/:nickname', async (req, res) => {
     if (position_y !== undefined) updateFields.position_y = position_y;
     if (health !== undefined) updateFields.health = health;
     if (coins !== undefined) updateFields.coins = coins;
+    if (level !== undefined) updateFields.level = level; // Actualizar level si es enviado
     updateFields.last_save_date = new Date();
 
     // Actualizar la partida
