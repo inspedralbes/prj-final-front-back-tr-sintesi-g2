@@ -42,11 +42,11 @@ const Game = sequelize.define('Game', {
     defaultValue: DataTypes.NOW
   },
   position_x: {
-    type: DataTypes.DECIMAL(10, 2),
+    type: DataTypes.INTEGER,
     defaultValue: 0
   },
   position_y: {
-    type: DataTypes.DECIMAL(10, 2),
+    type: DataTypes.INTEGER,
     defaultValue: 0
   },
   health: {
@@ -60,7 +60,13 @@ const Game = sequelize.define('Game', {
   time_played: {
     type: DataTypes.INTEGER,
     defaultValue: 0
-  }
+  },
+  level: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    defaultValue: 'MAPA TUTORIALL'
+  
+  },
 }, {
   tableName: 'game',
   timestamps: false

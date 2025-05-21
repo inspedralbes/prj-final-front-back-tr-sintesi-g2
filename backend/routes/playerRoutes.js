@@ -161,6 +161,33 @@ router.put('/player/selectedskin', async (req, res) => {
   }
 });
 
+router.put('/player/coins', async (req, res) => {
+  const { nickname, coins } = req.body;
+
+  if (!nickname || coins === undefined) {
+    return res.status(400).json({ error: 'Nickname y coins son requeridos.' });
+  }
+
+  try {
+    const player = await Player.findOne({ where: { nickname } });
+
+    if (!player) {
+      return res.status(404).json({ error: 'Jugador no encontrado.' });
+    }
+
+    player.coins = coins;
+    await player.save();
+
+    res.status(200).json({
+      message: 'Coins actualizadas con éxito.',
+      coins: player.coins,
+    });
+  } catch (error) {
+    console.error('Error al actualizar coins:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+});
+
 
 // Crear el servidor de express para el servicio de jugadores
 const app = express();

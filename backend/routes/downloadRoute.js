@@ -24,9 +24,10 @@ const startDownloadService = () => {
     archive.finalize();
   });
 
-  const port = 3015;
-  app.listen(port, () => {
-    console.log(`Download service running on port ${port}`);
+  const DOWNLOAD_PORT = process.env.DOWNLOAD_PORT || 3015;
+
+  app.listen(DOWNLOAD_PORT, () => {
+    console.log(`Download service running on port ${DOWNLOAD_PORT}`);
   });
 };
 

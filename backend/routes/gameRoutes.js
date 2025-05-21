@@ -13,8 +13,9 @@ router.post('/newGame', async (req, res) => {
     time_played = 0,
     position_x = 0,
     position_y = 0,
-    health = 100,
-    coins = 0
+    health = 70,
+    coins = 0,
+    level = 'MAPA TUTORIALL'
   } = req.body;
 
   if (!nickname || !game_name) {
@@ -28,17 +29,29 @@ router.post('/newGame', async (req, res) => {
       return res.status(404).send('Jugador no encontrado.');
     }
 
-    const existingGame = await Game.findOne({ 
-      where: { id_player: player.id_player } 
-    });
+    // Buscar partida existente
+    const existingGame = await Game.findOne({ where: { id_player: player.id_player } });
 
+    // Si existe, llama al endpoint /deleteGame/:nickname
     if (existingGame) {
-      return res.status(400).send('El jugador ya tiene una partida activa.');
+      try {
+        const response = await fetch(`https://thelastknightofaveron.cat/game/deleteGame/${nickname}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          console.error('Error al eliminar partida previa:', errorMsg);
+          return res.status(500).send('Error al eliminar la partida anterior.');
+        }
+      } catch (err) {
+        console.error('Error al llamar al endpoint /deleteGame:', err);
+        return res.status(500).send('Error al eliminar la partida anterior.');
+      }
     }
 
-    // Primero crear el inventario inicial usando fetch
+    // Crear inventario inicial usando fetch
     try {
-      const response = await fetch('http://localhost:3003/createInventory', {
+      const response = await fetch('https://thelastknightofaveron.cat/inventory/createInventory', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -59,7 +72,7 @@ router.post('/newGame', async (req, res) => {
         return res.status(500).send('Inventario no creado correctamente.');
       }
 
-      // Ahora crear el juego con el id_inventory
+      // Crear el juego con el id_inventory
       const game = await Game.create({
         id_player: player.id_player,
         id_inventory,
@@ -70,7 +83,8 @@ router.post('/newGame', async (req, res) => {
         position_x,
         position_y,
         health,
-        coins
+        coins,
+        level
       });
 
       res.status(201).json({ message: 'Partida creada con éxito.' });
@@ -83,6 +97,7 @@ router.post('/newGame', async (req, res) => {
     res.status(500).send('Error al crear la partida.');
   }
 });
+
 router.get('/game', async (req, res) => {
   try {
     const games = await Game.findAll({
@@ -106,7 +121,12 @@ router.get('/game', async (req, res) => {
       score: parseFloat(game.total_progress),
       time: game.time_played,
       status: game.game_status,
-      createdAt: game.last_save_date
+      createdAt: game.last_save_date,
+      level: game.level, // Agregado level
+      position_x: game.position_x,
+      position_y: game.position_y,
+      health: game.health,
+      coins: game.coins
     }));
 
     res.status(200).json(mappedGames);
@@ -186,6 +206,7 @@ router.get('/lastGame/:nickname', async (req, res) => {
         position_y: game.position_y,
         health: game.health,
         coins: game.coins,
+        level: game.level, // Agregado level
         inventory_id: game.Inventory.id_inventory
       }
     });
@@ -218,8 +239,9 @@ router.delete('/deleteGame/:nickname', async (req, res) => {
     }
 
     // Eliminar el inventario asociado
+    // Eliminar todos los objetos del inventario asociados al jugador
     await Inventory.destroy({
-      where: { id_inventory: game.id_inventory }
+      where: { player_id: player.id_player }
     });
 
     // Eliminar la partida
@@ -242,7 +264,8 @@ router.put('/updateGame/:nickname', async (req, res) => {
     position_x,
     position_y,
     health,
-    coins
+    coins,
+    level // Añadido level
   } = req.body;
 
   if (!nickname) {
@@ -274,6 +297,7 @@ router.put('/updateGame/:nickname', async (req, res) => {
     if (position_y !== undefined) updateFields.position_y = position_y;
     if (health !== undefined) updateFields.health = health;
     if (coins !== undefined) updateFields.coins = coins;
+    if (level !== undefined) updateFields.level = level; // Actualizar level si es enviado
     updateFields.last_save_date = new Date();
 
     // Actualizar la partida

@@ -11,11 +11,11 @@ const EnemyDeathStat = sequelize.define('EnemyDeathStat', {
     type: DataTypes.STRING(50),
     allowNull: true
   },
-  boss_name: {
+  bossName: {
     type: DataTypes.STRING(50),
     allowNull: true
   },
-  player_nickname: {
+  nickname: {
     type: DataTypes.STRING(50),
     allowNull: true
   },
