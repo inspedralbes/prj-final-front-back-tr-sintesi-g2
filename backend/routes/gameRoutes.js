@@ -13,9 +13,9 @@ router.post('/newGame', async (req, res) => {
     time_played = 0,
     position_x = 0,
     position_y = 0,
-    health = 70, // Cambiado a 70 por default según modelo
+    health = 70,
     coins = 0,
-    level = 'MAPA TUTORIALL' // Añadido level con default
+    level = 'MAPA TUTORIALL'
   } = req.body;
 
   if (!nickname || !game_name) {
@@ -29,15 +29,27 @@ router.post('/newGame', async (req, res) => {
       return res.status(404).send('Jugador no encontrado.');
     }
 
-    const existingGame = await Game.findOne({ 
-      where: { id_player: player.id_player } 
-    });
+    // Buscar partida existente
+    const existingGame = await Game.findOne({ where: { id_player: player.id_player } });
 
+    // Si existe, llama al endpoint /deleteGame/:nickname
     if (existingGame) {
-      return res.status(400).send('El jugador ya tiene una partida activa.');
+      try {
+        const response = await fetch(`http://localhost:3001/deleteGame/${nickname}`, {
+          method: 'DELETE'
+        });
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          console.error('Error al eliminar partida previa:', errorMsg);
+          return res.status(500).send('Error al eliminar la partida anterior.');
+        }
+      } catch (err) {
+        console.error('Error al llamar al endpoint /deleteGame:', err);
+        return res.status(500).send('Error al eliminar la partida anterior.');
+      }
     }
 
-    // Primero crear el inventario inicial usando fetch
+    // Crear inventario inicial usando fetch
     try {
       const response = await fetch('http://localhost:3003/createInventory', {
         method: 'POST',
@@ -60,7 +72,7 @@ router.post('/newGame', async (req, res) => {
         return res.status(500).send('Inventario no creado correctamente.');
       }
 
-      // Ahora crear el juego con el id_inventory
+      // Crear el juego con el id_inventory
       const game = await Game.create({
         id_player: player.id_player,
         id_inventory,
@@ -72,7 +84,7 @@ router.post('/newGame', async (req, res) => {
         position_y,
         health,
         coins,
-        level // Añadido level
+        level
       });
 
       res.status(201).json({ message: 'Partida creada con éxito.' });
@@ -227,8 +239,9 @@ router.delete('/deleteGame/:nickname', async (req, res) => {
     }
 
     // Eliminar el inventario asociado
+    // Eliminar todos los objetos del inventario asociados al jugador
     await Inventory.destroy({
-      where: { id_inventory: game.id_inventory }
+      where: { player_id: player.id_player }
     });
 
     // Eliminar la partida
