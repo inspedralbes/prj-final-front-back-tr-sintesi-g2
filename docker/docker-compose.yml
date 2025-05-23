@@ -1,0 +1,88 @@
+version: "3.8"
+
+services:
+  adminer:
+    image: adminer
+    container_name: trFinal_adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - trFinal_network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3310:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - trFinal_network
+
+  backend:
+    image: node:18-alpine
+    container_name: trFinal_backend
+    restart: always
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+      - "3002:3002"
+      - "3003:3003"
+      - "3004:3004"
+      - "3005:3005"
+      - "3006:3006"
+      - "3007:3007"
+      - "3008:3008"
+      - "3009:3009"
+      - "3010:3010"
+    working_dir: /app/backend
+    volumes:
+      - ../backend:/app/backend
+      - /app/backend/node_modules
+    depends_on:
+      - mysql
+    command: >
+      sh -c "
+        apk add --no-cache python3 py3-pip py3-numpy py3-matplotlib py3-pandas py3-seaborn py3-setuptools py3-wheel py3-pymysql py3-sqlalchemy &&
+        sleep 5 &&
+        npm install &&
+        npm run dev
+      "
+    networks:
+      - trFinal_network
+
+
+  frontend:
+    image: node:18-alpine
+    container_name: trFinal_frontend
+    restart: always
+    ports:
+      - "4000:4000"
+    working_dir: /app/frontend
+    volumes:
+      - ../frontend/vuetify-project:/app/frontend
+      - /app/frontend/node_modules
+    depends_on:
+      - backend
+    command: >
+      sh -c "
+        sleep 6 &&
+        npm install &&
+        npm run dev
+      "
+    networks:
+      - trFinal_network
+
+networks:
+  trFinal_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

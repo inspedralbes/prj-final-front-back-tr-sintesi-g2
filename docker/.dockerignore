@@ -1,0 +1,7 @@
+.env
+
+# BACK
+backend/node_modules
+
+# FRONT
+frontend/vue-project/node_modules
